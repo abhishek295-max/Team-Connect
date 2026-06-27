@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: online-chat-app
+    runtime: docker
+    plan: free
+
+    autoDeploy: true
+
+    healthCheckPath: /
+
+    envVars:
+      - key: JAVA_OPTS
+        value: "-Xms256m -Xmx512m"

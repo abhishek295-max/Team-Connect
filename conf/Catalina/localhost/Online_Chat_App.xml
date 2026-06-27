@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Context docBase="C:/Users/pcc/Desktop/Online_Chat_App/src/main/webapp">
+  <Resources cacheMaxSize="10240">
+    <PreResources base="C:/Users/pcc/Desktop/Online_Chat_App/target/classes" className="org.apache.catalina.webresources.DirResourceSet" webAppMount="/WEB-INF/classes"/>
+    <PostResources base="C:/Users/pcc/.m2/repository/com/mysql/mysql-connector-j/9.7.0/mysql-connector-j-9.7.0.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/mysql-connector-j-9.7.0.jar"/>
+    <PostResources base="C:/Users/pcc/.m2/repository/com/google/protobuf/protobuf-java/4.31.1/protobuf-java-4.31.1.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/protobuf-java-4.31.1.jar"/>
+    <PostResources base="C:/Users/pcc/.m2/repository/org/springframework/security/spring-security-crypto/6.2.0/spring-security-crypto-6.2.0.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/spring-security-crypto-6.2.0.jar"/>
+    <PostResources base="C:/Users/pcc/.m2/repository/commons-logging/commons-logging/1.2/commons-logging-1.2.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/commons-logging-1.2.jar"/>
+    <PostResources base="C:/Users/pcc/.m2/repository/com/sun/mail/javax.mail/1.6.2/javax.mail-1.6.2.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/javax.mail-1.6.2.jar"/>
+    <PostResources base="C:/Users/pcc/.m2/repository/javax/activation/activation/1.1/activation-1.1.jar" className="org.apache.catalina.webresources.FileResourceSet" webAppMount="/WEB-INF/lib/activation-1.1.jar"/>
+  </Resources>
+</Context>
