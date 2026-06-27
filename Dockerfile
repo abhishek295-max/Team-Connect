@@ -1,5 +1,5 @@
 # ---------- Build Stage ----------
-FROM maven:3.9.9-eclipse-temurin-24 AS builder
+FROM maven:3.9.9-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # ---------- Runtime Stage ----------
-FROM tomcat:11.0-jdk24-temurin
+FROM tomcat:11.0-jdk21-temurin
 
 RUN rm -rf /usr/local/tomcat/webapps/*
 

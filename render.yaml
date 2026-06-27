@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: online-chat-app
+    name: team-connect
     runtime: docker
     plan: free
 
