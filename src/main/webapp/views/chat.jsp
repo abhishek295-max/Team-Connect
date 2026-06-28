@@ -49,22 +49,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Online Chat System</title>
+    <title>TeamConnect | Chat</title>
     <style>
         :root {
-            --bg-a: #17131a;
-            --bg-b: #241a18;
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-strong: rgba(255, 255, 255, 0.14);
-            --border: rgba(255, 255, 255, 0.16);
-            --text: #fff7f0;
-            --muted: rgba(255, 247, 240, 0.72);
-            --accent: #f4b860;
-            --accent-2: #44d8c0;
-            --accent-3: #ff7d6b;
-            --success: #3fe09a;
-            --danger: #ff7e7e;
-            --shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+            --bg-a: #020818;
+            --bg-b: #030d20;
+            --panel: rgba(3, 10, 28, 0.78);
+            --panel-strong: rgba(2, 8, 22, 0.9);
+            --border: rgba(59, 130, 246, 0.16);
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --accent: #2563eb;
+            --accent-2: #60a5fa;
+            --accent-3: #38bdf8;
+            --success: #34d399;
+            --danger: #f87171;
+            --shadow: 0 28px 72px rgba(0, 0, 0, 0.65);
         }
 
         * { box-sizing: border-box; }
@@ -72,11 +72,12 @@
         html, body {
             margin: 0;
             min-height: 100%;
-            font-family: "Segoe UI", Arial, sans-serif;
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
             color: var(--text);
             background:
-                linear-gradient(135deg, rgba(244, 184, 96, 0.14), transparent 35%),
-                linear-gradient(225deg, rgba(68, 216, 192, 0.12), transparent 30%),
+                radial-gradient(ellipse 90% 60% at 8% -10%, rgba(37, 99, 235, 0.24) 0%, transparent 52%),
+                radial-gradient(ellipse 70% 55% at 94% 8%, rgba(96, 165, 250, 0.15) 0%, transparent 48%),
+                radial-gradient(ellipse 75% 55% at 50% 112%, rgba(59, 130, 246, 0.11) 0%, transparent 55%),
                 linear-gradient(180deg, var(--bg-a), var(--bg-b));
         }
 
@@ -95,9 +96,8 @@
             position: fixed;
             inset: 0;
             background:
-                radial-gradient(circle at 18% 18%, rgba(244, 184, 96, 0.10), transparent 28%),
-                radial-gradient(circle at 82% 16%, rgba(68, 216, 192, 0.08), transparent 24%),
-                radial-gradient(circle at 72% 82%, rgba(255, 125, 107, 0.08), transparent 28%);
+                radial-gradient(ellipse 680px 400px at 12% 22%, rgba(37, 99, 235, 0.09) 0%, transparent 70%),
+                radial-gradient(ellipse 540px 360px at 88% 78%, rgba(96, 165, 250, 0.07) 0%, transparent 70%);
             pointer-events: none;
         }
 
@@ -114,9 +114,9 @@
         .panel {
             border: 1px solid var(--border);
             border-radius: 24px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: var(--panel);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
             box-shadow: var(--shadow);
         }
 
@@ -129,6 +129,7 @@
             position: sticky;
             top: 16px;
             z-index: 8;
+            background: rgba(3, 10, 28, 0.82);
         }
 
         .brand-inline {
@@ -145,9 +146,9 @@
             display: grid;
             place-items: center;
             font-weight: 800;
-            color: #06131f;
-            background: linear-gradient(145deg, var(--accent-2), var(--accent));
-            box-shadow: 0 12px 28px rgba(68, 216, 192, 0.22);
+            color: #ffffff;
+            background: linear-gradient(145deg, var(--accent), var(--accent-2));
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.28);
             flex: 0 0 auto;
         }
 
@@ -178,7 +179,7 @@
             gap: 8px;
             padding: 10px 12px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.12);
             color: var(--muted);
             font-size: 13px;
@@ -189,8 +190,8 @@
         }
 
         .chip-live {
-            background: rgba(63, 224, 154, 0.10);
-            border-color: rgba(63, 224, 154, 0.16);
+            background: rgba(52, 211, 153, 0.10);
+            border-color: rgba(52, 211, 153, 0.18);
         }
 
         .live-dot {
@@ -210,12 +211,15 @@
         .stat-card {
             padding: 18px;
             min-height: 92px;
+            background: rgba(3, 10, 28, 0.72);
         }
 
         .stat-card span {
             display: block;
             color: var(--muted);
             font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
         }
 
         .stat-card strong {
@@ -228,7 +232,7 @@
         .workspace {
             min-height: 0;
             display: grid;
-            grid-template-columns: 320px minmax(0, 1fr) 300px;
+            grid-template-columns: 300px minmax(0, 1fr) 280px;
             gap: 16px;
         }
 
@@ -243,7 +247,7 @@
 
         .panel-header {
             padding: 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .panel-header h3 {
@@ -267,8 +271,8 @@
             width: 100%;
             min-height: 46px;
             border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(59, 130, 246, 0.18);
+            background: rgba(37, 99, 235, 0.06);
             color: var(--text);
             padding: 0 14px;
             outline: none;
@@ -276,8 +280,8 @@
         }
 
         .search input:focus {
-            border-color: rgba(244, 184, 96, 0.65);
-            box-shadow: 0 0 0 4px rgba(244, 184, 96, 0.10);
+            border-color: rgba(96, 165, 250, 0.65);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
         }
 
         .contact-list {
@@ -305,8 +309,8 @@
 
         .contact-item:hover,
         .contact-item.active {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.12);
+            background: rgba(37, 99, 235, 0.10);
+            border-color: rgba(96, 165, 250, 0.22);
         }
 
         .contact-item:hover {
@@ -321,9 +325,9 @@
             display: grid;
             place-items: center;
             font-weight: 700;
-            color: #06131f;
-            background: linear-gradient(145deg, rgba(68, 216, 192, 0.95), rgba(244, 184, 96, 0.95));
-            box-shadow: 0 12px 24px rgba(244, 184, 96, 0.14);
+            color: #ffffff;
+            background: linear-gradient(145deg, rgba(37, 99, 235, 0.95), rgba(96, 165, 250, 0.95));
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.16);
         }
 
         .contact-copy {
@@ -357,7 +361,7 @@
         }
 
         .contact-email {
-            color: rgba(255, 247, 240, 0.86);
+            color: rgba(241, 245, 249, 0.88);
         }
 
         .contact-preview {
@@ -378,16 +382,16 @@
             width: 100%;
             min-height: 46px;
             border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(59, 130, 246, 0.18);
+            background: rgba(37, 99, 235, 0.06);
             color: var(--text);
             padding: 0 14px;
             outline: none;
         }
 
         .history-search input:focus {
-            border-color: rgba(244, 184, 96, 0.65);
-            box-shadow: 0 0 0 4px rgba(244, 184, 96, 0.10);
+            border-color: rgba(96, 165, 250, 0.65);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
         }
 
         .history-note {
@@ -398,12 +402,12 @@
         }
 
         .conversation-panel {
-            background: rgba(255, 255, 255, 0.06);
+            background: linear-gradient(180deg, rgba(3, 10, 28, 0.86), rgba(2, 8, 22, 0.92));
         }
 
         .conversation-header {
             padding: 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             justify-content: space-between;
             gap: 16px;
@@ -431,7 +435,7 @@
             flex-direction: column;
             gap: 12px;
             background:
-                linear-gradient(180deg, rgba(244, 184, 96, 0.05), transparent 22%),
+                linear-gradient(180deg, rgba(37, 99, 235, 0.05), transparent 22%),
                 transparent;
         }
 
@@ -465,8 +469,8 @@
             max-width: min(78%, 760px);
             padding: 12px 14px;
             border-radius: 18px;
-            background: rgba(255, 255, 255, 0.10);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.10);
             box-shadow: 0 10px 18px rgba(17, 30, 54, 0.08);
             transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
@@ -477,8 +481,8 @@
         }
 
         .mine .bubble {
-            background: linear-gradient(145deg, rgba(244, 184, 96, 0.98), rgba(68, 216, 192, 0.88));
-            color: #06131f;
+            background: linear-gradient(145deg, var(--accent), var(--accent-3));
+            color: #ffffff;
             border-color: transparent;
         }
 
@@ -507,8 +511,8 @@
             gap: 10px;
             padding: 12px;
             border-radius: 16px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.10);
         }
 
         .attachment-card.image {
@@ -545,7 +549,7 @@
             min-height: 40px;
             padding: 0 12px;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.10);
+            background: rgba(37, 99, 235, 0.12);
             color: inherit;
             width: fit-content;
         }
@@ -577,8 +581,8 @@
             min-height: 40px;
             padding: 0 14px;
             border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.18);
+            background: rgba(37, 99, 235, 0.08);
             color: var(--text);
             cursor: pointer;
         }
@@ -589,8 +593,8 @@
             gap: 8px;
             padding: 8px 12px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.10);
+            background: rgba(37, 99, 235, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.14);
             color: var(--muted);
             font-size: 12px;
         }
@@ -608,8 +612,8 @@
             width: 32px;
             height: 32px;
             border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.16);
+            background: rgba(37, 99, 235, 0.08);
             color: var(--text);
             cursor: pointer;
             font-size: 18px;
@@ -643,7 +647,7 @@
 
         .message-action {
             border: 0;
-            background: rgba(255, 255, 255, 0.10);
+            background: rgba(255, 255, 255, 0.08);
             color: inherit;
             border-radius: 999px;
             padding: 7px 10px;
@@ -654,7 +658,7 @@
 
         .message-action:hover {
             transform: translateY(-1px);
-            background: rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.14);
         }
 
         .message-action.danger {
@@ -663,11 +667,11 @@
 
         .composer {
             padding: 14px 18px;
-            border-top: 1px solid rgba(255, 255, 255, 0.10);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             display: flex;
             gap: 12px;
             align-items: flex-end;
-            background: rgba(7, 17, 31, 0.32);
+            background: rgba(2, 8, 22, 0.82);
         }
 
         .composer textarea {
@@ -676,8 +680,8 @@
             max-height: 180px;
             resize: vertical;
             border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(59, 130, 246, 0.18);
+            background: rgba(37, 99, 235, 0.06);
             padding: 14px 15px;
             color: var(--text);
             outline: none;
@@ -685,8 +689,8 @@
         }
 
         .composer textarea:focus {
-            border-color: rgba(244, 184, 96, 0.65);
-            box-shadow: 0 0 0 4px rgba(244, 184, 96, 0.10);
+            border-color: rgba(96, 165, 250, 0.65);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
         }
 
         .btn {
@@ -707,16 +711,16 @@
         }
 
         .btn-primary {
-            background: linear-gradient(145deg, var(--accent), var(--accent-3));
-            color: #06131f;
+            background: linear-gradient(145deg, var(--accent), var(--accent-2));
+            color: #ffffff;
             font-weight: 700;
-            box-shadow: 0 14px 26px rgba(244, 184, 96, 0.18);
+            box-shadow: 0 14px 26px rgba(37, 99, 235, 0.22);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
-            border-color: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.12);
         }
 
         .btn:disabled {
@@ -742,6 +746,9 @@
 
         .detail-row span {
             color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 12px;
         }
 
         .detail-row strong {
@@ -809,9 +816,63 @@
                 align-items: stretch;
             }
 
+            .topbar-meta {
+                width: 100%;
+            }
+
+            .topbar-meta .chip,
+            .topbar-meta .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
             .stats-row,
             .workspace {
                 grid-template-columns: 1fr;
+            }
+
+            .stats-row {
+                display: none;
+            }
+
+            .insights-panel {
+                display: none;
+            }
+
+            .contact-item {
+                align-items: flex-start;
+            }
+
+            .contact-head {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .composer-tools {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .attach-button,
+            .attachment-chip,
+            .attachment-clear {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .bubble-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .bubble-actions {
+                width: 100%;
+                flex-wrap: wrap;
+                opacity: 1;
+            }
+
+            .message-action {
+                flex: 1 1 auto;
             }
 
             .bubble {
@@ -820,6 +881,16 @@
 
             .btn {
                 width: 100%;
+            }
+
+            .detail-row,
+            .topbar-meta,
+            .composer-tools {
+                gap: 8px;
+            }
+
+            .attachment-thumb {
+                max-height: 180px;
             }
         }
 
@@ -845,10 +916,10 @@
     <div class="dashboard-shell">
         <header class="panel topbar">
             <div class="brand-inline">
-                <div class="brand-mark">OC</div>
+                <div class="brand-mark">TC</div>
                 <div>
-                    <h2>Online Chat System</h2>
-                    <div class="muted">Glassmorphism dashboard with live thread refresh</div>
+                    <h2>TeamConnect</h2>
+                    <div class="muted">Messaging workspace with live thread refresh</div>
                 </div>
             </div>
 
@@ -868,28 +939,28 @@
 
         <section class="stats-row">
             <div class="panel stat-card">
-                <span>Contacts</span>
+                <span>People</span>
                 <strong id="contactStat"><%= contactCount %></strong>
             </div>
             <div class="panel stat-card">
-                <span>Messages in thread</span>
+                <span>Thread msgs</span>
                 <strong id="messageStat"><%= messageCount %></strong>
             </div>
             <div class="panel stat-card">
-                <span>Status</span>
-                <strong id="focusStat"><%= activeContactId > 0 ? "Live" : "Idle" %></strong>
+                <span>Presence</span>
+                <strong id="focusStat"><%= activeContactId > 0 ? "Chatting" : "Idle" %></strong>
             </div>
         </section>
 
         <section class="workspace">
             <aside class="panel sidebar">
                 <div class="panel-header">
-                    <h3>Contacts</h3>
+                    <h3>Chats</h3>
                     <p>Search and open a conversation.</p>
                 </div>
 
                 <div class="search">
-                    <input id="contactSearch" type="search" placeholder="Search contacts">
+                    <input id="contactSearch" type="search" placeholder="Search people">
                 </div>
 
                 <div class="contact-list" id="contactList">
@@ -1018,7 +1089,7 @@
 
             <aside class="panel insights-panel">
                 <div class="panel-header">
-                    <h3>Workspace</h3>
+                    <h3>Thread info</h3>
                     <p>Quick details about the signed-in account and active thread.</p>
                 </div>
 

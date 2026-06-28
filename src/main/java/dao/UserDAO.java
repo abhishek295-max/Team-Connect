@@ -15,19 +15,56 @@ public class UserDAO {
     private final BCryptPasswordEncoder passwordEncoder =
             new BCryptPasswordEncoder();
 
-    public boolean register(
+    public static final class RegistrationResult {
+        private final boolean success;
+        private final String reason;
+
+        private RegistrationResult(boolean success, String reason) {
+            this.success = success;
+            this.reason = reason;
+        }
+
+        public static RegistrationResult success() {
+            return new RegistrationResult(true, null);
+        }
+
+        public static RegistrationResult failure(String reason) {
+            return new RegistrationResult(false, reason);
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+    }
+
+    public RegistrationResult registerUser(
             String username,
             String email,
             String password) {
 
         if (isBlank(username) || isBlank(email) || isBlank(password)) {
-            return false;
+            return RegistrationResult.failure("invalid_input");
         }
+
+        String cleanUsername = username.trim();
+        String cleanEmail = email.trim();
 
         try (Connection con = DBConnection.getConnection()) {
 
-            if (con == null || userExists(con, username, email)) {
-                return false;
+            if (con == null) {
+                return RegistrationResult.failure("database_unavailable");
+            }
+
+            if (usernameExists(con, cleanUsername)) {
+                return RegistrationResult.failure("username_taken");
+            }
+
+            if (emailExists(con, cleanEmail)) {
+                return RegistrationResult.failure("email_taken");
             }
 
             String hashedPassword =
@@ -39,18 +76,27 @@ public class UserDAO {
             try (PreparedStatement ps =
                          con.prepareStatement(sql)) {
 
-                ps.setString(1, username.trim());
-                ps.setString(2, email.trim());
+                ps.setString(1, cleanUsername);
+                ps.setString(2, cleanEmail);
                 ps.setString(3, hashedPassword);
 
-                return ps.executeUpdate() > 0;
+                return ps.executeUpdate() > 0
+                        ? RegistrationResult.success()
+                        : RegistrationResult.failure("database_error");
             }
 
         } catch(Exception e) {
             e.printStackTrace();
+            return RegistrationResult.failure("database_error");
         }
+    }
 
-        return false;
+    public boolean register(
+            String username,
+            String email,
+            String password) {
+
+        return registerUser(username, email, password).isSuccess();
     }
 
     public User authenticate(
@@ -208,17 +254,31 @@ public class UserDAO {
         return 0;
     }
 
-    private boolean userExists(Connection con,
-                               String username,
-                               String email) throws Exception {
+    private boolean usernameExists(Connection con,
+                                   String username) throws Exception {
 
         String sql =
-                "SELECT id FROM users WHERE username=? OR email=?";
+                "SELECT id FROM users WHERE username=?";
 
         try (PreparedStatement ps =
                      con.prepareStatement(sql)) {
             ps.setString(1, username.trim());
-            ps.setString(2, email.trim());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    private boolean emailExists(Connection con,
+                                String email) throws Exception {
+
+        String sql =
+                "SELECT id FROM users WHERE email=?";
+
+        try (PreparedStatement ps =
+                     con.prepareStatement(sql)) {
+            ps.setString(1, email.trim());
 
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();

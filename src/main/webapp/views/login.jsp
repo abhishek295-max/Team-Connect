@@ -7,6 +7,12 @@
 
     String error = request.getParameter("error");
     String registered = request.getParameter("registered");
+    String noticeText = null;
+    if ("1".equals(registered)) {
+        noticeText = "Registration completed successfully. You can sign in now.";
+    } else if ("invalid".equals(error) || "1".equals(error)) {
+        noticeText = "Invalid username or password.";
+    }
     String contextPath = request.getContextPath();
 %>
 <!DOCTYPE html>
@@ -354,8 +360,50 @@
         }
         @media (max-width: 680px) {
             .page { padding: 12px; }
-            .left, .auth-right, .auth-card { padding: 22px; }
+            .shell {
+                min-height: auto;
+                gap: 12px;
+            }
+
+            .left {
+                display: none;
+            }
+
+            .auth-right {
+                padding: 0;
+                align-items: stretch;
+            }
+
+            .auth-card {
+                padding: 20px;
+                border-radius: 22px;
+            }
+
+            .auth-card h2 {
+                font-size: 24px;
+            }
+
+            .auth-card > p,
+            .micro {
+                font-size: 12px;
+                line-height: 1.6;
+            }
+
+            .action-row {
+                margin-top: 12px;
+            }
+
+            .action-row .button {
+                width: 100%;
+            }
+
+            .field input,
+            .button {
+                min-height: 48px;
+            }
+
             .metrics { grid-template-columns: 1fr; }
+            .form { gap: 12px; margin-top: 18px; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -367,6 +415,14 @@
     </style>
 </head>
 <body>
+<script>
+    if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+    }
+    window.addEventListener("load", function () {
+        window.scrollTo(0, 0);
+    });
+</script>
 <div class="page">
     <div class="shell">
         <section class="panel left">
@@ -420,12 +476,8 @@
                 <h2>Login</h2>
                 <p>Use your account details to open the chat dashboard.</p>
 
-                <% if ("1".equals(registered)) { %>
-                <div class="notice">Registration completed successfully. You can sign in now.</div>
-                <% } %>
-
-                <% if ("1".equals(error)) { %>
-                <div class="notice error">Invalid username or password.</div>
+                <% if (noticeText != null) { %>
+                <div class="notice <%= "1".equals(registered) ? "" : "error" %>"><%= noticeText %></div>
                 <% } %>
 
                 <form class="form" action="<%= contextPath %>/login" method="post">

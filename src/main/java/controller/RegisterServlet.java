@@ -29,8 +29,10 @@ public class RegisterServlet extends HttpServlet {
                 request.getParameter("password");
 
         UserDAO dao = new UserDAO();
+        UserDAO.RegistrationResult result =
+                dao.registerUser(username, email, password);
 
-        if(dao.register(username,email,password)) {
+        if(result.isSuccess()) {
 
             response.sendRedirect(
                     request.getContextPath() +
@@ -38,9 +40,14 @@ public class RegisterServlet extends HttpServlet {
 
         } else {
 
+            String reason = result.getReason();
+            if (reason == null || reason.isEmpty()) {
+                reason = "database_error";
+            }
+
             response.sendRedirect(
                     request.getContextPath() +
-                            "/views/register.jsp?error=1");
+                            "/views/register.jsp?error=" + reason);
         }
     }
 }
