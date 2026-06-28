@@ -14,6 +14,7 @@ public class Message {
     private String attachmentType;
     private String attachmentKind;
     private long attachmentSize;
+    private byte[] attachmentData;
 
     public int getId() {
         return id;
@@ -93,6 +94,14 @@ public class Message {
 
     public void setAttachmentSize(long attachmentSize) {
         this.attachmentSize = attachmentSize;
+    }
+
+    public byte[] getAttachmentData() {
+        return attachmentData;
+    }
+
+    public void setAttachmentData(byte[] attachmentData) {
+        this.attachmentData = attachmentData;
     }
 
     public boolean hasAttachment() {

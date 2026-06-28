@@ -104,7 +104,7 @@ public class MessageDAO {
 
             String sql =
                     "SELECT m.id, m.sender_id, m.receiver_id, m.message, m.sent_at, " +
-                    "a.original_name, a.stored_name, a.content_type, a.file_size, a.file_kind " +
+                    "a.original_name, a.stored_name, a.content_type, a.file_size, a.file_kind, a.file_data " +
                     "FROM messages " +
                     "m LEFT JOIN message_attachments a ON a.message_id = m.id " +
                     "WHERE (m.sender_id=? AND m.receiver_id=?) " +
@@ -132,6 +132,7 @@ public class MessageDAO {
                         message.setAttachmentType(rs.getString("content_type"));
                         message.setAttachmentSize(rs.getLong("file_size"));
                         message.setAttachmentKind(rs.getString("file_kind"));
+                        message.setAttachmentData(rs.getBytes("file_data"));
                         messages.add(message);
                     }
                 }
@@ -223,7 +224,7 @@ public class MessageDAO {
 
             String sql =
                     "SELECT m.id, m.sender_id, m.receiver_id, m.message, m.sent_at, " +
-                            "a.original_name, a.stored_name, a.content_type, a.file_size, a.file_kind " +
+                            "a.original_name, a.stored_name, a.content_type, a.file_size, a.file_kind, a.file_data " +
                             "FROM messages m " +
                             "LEFT JOIN message_attachments a ON a.message_id = m.id " +
                             "WHERE m.id=?";
@@ -272,8 +273,8 @@ public class MessageDAO {
                                      int messageId,
                                      AttachmentUtil.StoredAttachment attachment) throws Exception {
         String sql =
-                "INSERT INTO message_attachments(message_id, original_name, stored_name, content_type, file_size, file_kind) " +
-                "VALUES(?,?,?,?,?,?)";
+                "INSERT INTO message_attachments(message_id, original_name, stored_name, content_type, file_size, file_kind, file_data) " +
+                "VALUES(?,?,?,?,?,?,?)";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, messageId);
@@ -282,6 +283,7 @@ public class MessageDAO {
             ps.setString(4, attachment.getContentType());
             ps.setLong(5, attachment.getFileSize());
             ps.setString(6, attachment.getKind());
+            ps.setBytes(7, attachment.getData());
             return ps.executeUpdate() > 0;
         }
     }
@@ -294,11 +296,19 @@ public class MessageDAO {
                         "stored_name VARCHAR(255) NOT NULL, " +
                         "content_type VARCHAR(128) NOT NULL, " +
                         "file_size BIGINT NOT NULL, " +
-                        "file_kind VARCHAR(32) NOT NULL" +
+                        "file_kind VARCHAR(32) NOT NULL, " +
+                        "file_data LONGBLOB NULL" +
                         ")";
 
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.execute();
+        }
+
+        try (PreparedStatement ps = con.prepareStatement(
+                "ALTER TABLE message_attachments ADD COLUMN file_data LONGBLOB NULL")) {
+            ps.execute();
+        } catch (Exception ignored) {
+            // Column may already exist.
         }
 
         try (PreparedStatement ps = con.prepareStatement(
@@ -335,6 +345,7 @@ public class MessageDAO {
         message.setAttachmentType(rs.getString("content_type"));
         message.setAttachmentSize(rs.getLong("file_size"));
         message.setAttachmentKind(rs.getString("file_kind"));
+        message.setAttachmentData(rs.getBytes("file_data"));
         return message;
     }
 }

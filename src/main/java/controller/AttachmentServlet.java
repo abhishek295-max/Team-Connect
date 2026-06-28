@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -70,14 +72,22 @@ public class AttachmentServlet extends HttpServlet {
             return;
         }
 
-        if (!AttachmentUtil.isInsideStorage(filePath) || !Files.isRegularFile(filePath)) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-        long fileSize = Files.size(filePath);
         String contentType = resolveContentType(message, filePath);
         boolean inline = shouldDisplayInline(message, contentType);
+        byte[] payload = message.getAttachmentData();
+        long fileSize;
+        boolean fromDatabase = payload != null && payload.length > 0;
+
+        if (fromDatabase) {
+            fileSize = payload.length;
+        } else {
+            if (!AttachmentUtil.isInsideStorage(filePath) || !Files.isRegularFile(filePath)) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            fileSize = Files.size(filePath);
+        }
 
         response.resetBuffer();
         response.setContentType(contentType);
@@ -88,7 +98,13 @@ public class AttachmentServlet extends HttpServlet {
                 buildContentDisposition(inline, message.getAttachmentName()));
 
         try (OutputStream out = response.getOutputStream()) {
-            Files.copy(filePath, out);
+            if (fromDatabase) {
+                try (InputStream in = new ByteArrayInputStream(payload)) {
+                    in.transferTo(out);
+                }
+            } else {
+                Files.copy(filePath, out);
+            }
             out.flush();
         }
     }

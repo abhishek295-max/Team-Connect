@@ -99,25 +99,27 @@ public final class AttachmentUtil {
                 ? "image"
                 : "file";
 
+        byte[] data;
+        try (InputStream in = part.getInputStream()) {
+            data = in.readAllBytes();
+        }
+
+        long fileSize = data.length;
+        if (fileSize <= 0) {
+            return null;
+        }
+
+        if (fileSize > MAX_FILE_SIZE) {
+            throw new IOException("Attachment exceeds the maximum size.");
+        }
+
         Path storageDir = storageDir();
         Files.createDirectories(storageDir);
 
         String storedName = UUID.randomUUID().toString().replace("-", "") + extension;
         Path target = storageDir.resolve(storedName).normalize();
 
-        try (InputStream in = part.getInputStream()) {
-            Files.copy(in, target);
-        }
-
-        long fileSize = part.getSize();
-        if (fileSize <= 0) {
-            fileSize = Files.size(target);
-        }
-
-        if (fileSize > MAX_FILE_SIZE) {
-            Files.deleteIfExists(target);
-            throw new IOException("Attachment exceeds the maximum size.");
-        }
+        Files.write(target, data);
 
         return new StoredAttachment(
                 originalName,
@@ -126,7 +128,8 @@ public final class AttachmentUtil {
                         ? "application/octet-stream"
                         : contentType,
                 fileSize,
-                kind);
+                kind,
+                data);
     }
 
     public static Path resolveStoredPath(String storedName) {
@@ -223,17 +226,20 @@ public final class AttachmentUtil {
         private final String contentType;
         private final long fileSize;
         private final String kind;
+        private final byte[] data;
 
         public StoredAttachment(String originalName,
                                 String storedName,
                                 String contentType,
                                 long fileSize,
-                                String kind) {
+                                String kind,
+                                byte[] data) {
             this.originalName = originalName;
             this.storedName = storedName;
             this.contentType = contentType;
             this.fileSize = fileSize;
             this.kind = kind;
+            this.data = data;
         }
 
         public String getOriginalName() {
@@ -254,6 +260,10 @@ public final class AttachmentUtil {
 
         public String getKind() {
             return kind;
+        }
+
+        public byte[] getData() {
+            return data;
         }
     }
 }

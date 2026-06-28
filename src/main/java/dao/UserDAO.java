@@ -325,6 +325,7 @@ public class UserDAO {
                         "content_type VARCHAR(128) NOT NULL, " +
                         "file_size BIGINT NOT NULL, " +
                         "file_kind VARCHAR(32) NOT NULL, " +
+                        "file_data LONGBLOB NULL, " +
                         "CONSTRAINT fk_message_attachment " +
                         "FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE" +
                         ")";
@@ -335,6 +336,13 @@ public class UserDAO {
             if (e.getMessage() == null || !e.getMessage().toLowerCase().contains("foreign")) {
                 throw e;
             }
+        }
+
+        try (PreparedStatement ps = con.prepareStatement(
+                "ALTER TABLE message_attachments ADD COLUMN file_data LONGBLOB NULL")) {
+            ps.execute();
+        } catch (Exception ignored) {
+            // Column may already exist.
         }
     }
 

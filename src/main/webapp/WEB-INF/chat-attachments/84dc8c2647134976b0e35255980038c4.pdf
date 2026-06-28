@@ -1,0 +1,315 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 3085 >>
+stream
+1.000 1.000 1.000 rg
+0 0 595 842 re
+f
+0.050 0.110 0.220 rg
+0 760 595 82 re
+f
+0.120 0.680 0.900 rg
+42 776 28 28 re
+f
+BT
+1.000 1.000 1.000 rg
+/F2 16 Tf
+48 794 Td
+(S) Tj
+ET
+BT
+1.000 1.000 1.000 rg
+/F2 24 Tf
+78 800 Td
+(ShopSphere Invoice) Tj
+ET
+BT
+0.820 0.880 0.950 rg
+/F1 10 Tf
+78 782 Td
+(Clean order summary and payment record) Tj
+ET
+BT
+0.760 0.830 0.910 rg
+/F1 10 Tf
+78 770 Td
+(Generated automatically from the checkout flow) Tj
+ET
+q
+0.780 0.840 0.900 RG
+0.900 w
+394 768 160 54 re
+S
+Q
+BT
+0.520 0.580 0.660 rg
+/F2 9 Tf
+408 804 Td
+(ORDER ID) Tj
+ET
+BT
+0.080 0.130 0.200 rg
+/F1 11 Tf
+408 787 Td
+(70069434) Tj
+ET
+BT
+0.520 0.580 0.660 rg
+/F2 9 Tf
+408 776 Td
+(DATE) Tj
+ET
+BT
+0.080 0.130 0.200 rg
+/F1 11 Tf
+408 761 Td
+(28-06-2026 14:25:39) Tj
+ET
+q
+0.860 0.890 0.930 RG
+1.000 w
+42 674 328 68 re
+S
+Q
+0.950 0.970 1.000 rg
+42 674 328 22 re
+f
+BT
+0.400 0.460 0.550 rg
+/F2 9 Tf
+56 687 Td
+(CUSTOMER) Tj
+ET
+BT
+0.090 0.140 0.200 rg
+/F1 13 Tf
+56 665 Td
+(Anubhuti Jain) Tj
+ET
+BT
+0.470 0.530 0.620 rg
+/F1 9 Tf
+56 651 Td
+(Billing prepared from the active session.) Tj
+ET
+q
+0.860 0.890 0.930 RG
+1.000 w
+386 674 167 68 re
+S
+Q
+0.950 0.970 1.000 rg
+386 674 167 22 re
+f
+BT
+0.400 0.460 0.550 rg
+/F2 9 Tf
+400 687 Td
+(SUMMARY) Tj
+ET
+BT
+0.090 0.140 0.200 rg
+/F1 12 Tf
+400 665 Td
+(Rs 7497.00) Tj
+ET
+BT
+0.470 0.530 0.620 rg
+/F1 9 Tf
+400 651 Td
+(Grand total payable) Tj
+ET
+0.090 0.140 0.200 rg
+42 618 511 28 re
+f
+BT
+1.000 1.000 1.000 rg
+/F2 9 Tf
+56 627 Td
+(PRODUCT) Tj
+ET
+BT
+1.000 1.000 1.000 rg
+/F2 9 Tf
+338 627 Td
+(QTY) Tj
+ET
+BT
+1.000 1.000 1.000 rg
+/F2 9 Tf
+386 627 Td
+(UNIT PRICE) Tj
+ET
+BT
+1.000 1.000 1.000 rg
+/F2 9 Tf
+484 627 Td
+(AMOUNT) Tj
+ET
+0.980 0.990 1.000 rg
+42 586 511 28 re
+f
+BT
+0.080 0.130 0.200 rg
+/F1 10 Tf
+56 596 Td
+(City Laptop Backpack) Tj
+ET
+BT
+0.080 0.130 0.200 rg
+/F1 10 Tf
+346 596 Td
+(3) Tj
+ET
+BT
+0.080 0.130 0.200 rg
+/F1 10 Tf
+402 596 Td
+(Rs 2499.00) Tj
+ET
+BT
+0.080 0.130 0.200 rg
+/F1 10 Tf
+502 596 Td
+(Rs 7497.00) Tj
+ET
+q
+0.880 0.910 0.950 RG
+0.600 w
+42 586 m
+553 586 l
+S
+Q
+q
+0.860 0.890 0.930 RG
+1.000 w
+340 178 213 120 re
+S
+Q
+0.950 0.970 1.000 rg
+340 272 213 26 re
+f
+BT
+0.400 0.460 0.550 rg
+/F2 9 Tf
+354 192 Td
+(PAYMENT BREAKDOWN) Tj
+ET
+BT
+0.230 0.280 0.350 rg
+/F1 10 Tf
+354 162 Td
+(Subtotal) Tj
+ET
+BT
+0.230 0.280 0.350 rg
+/F1 10 Tf
+354 146 Td
+(Shipping) Tj
+ET
+BT
+0.230 0.280 0.350 rg
+/F1 10 Tf
+354 130 Td
+(Tax) Tj
+ET
+BT
+0.060 0.110 0.180 rg
+/F2 12 Tf
+354 108 Td
+(Grand Total) Tj
+ET
+BT
+0.230 0.280 0.350 rg
+/F1 10 Tf
+470 162 Td
+(Rs 7497.00) Tj
+ET
+BT
+0.230 0.280 0.350 rg
+/F1 10 Tf
+501 146 Td
+(Free) Tj
+ET
+BT
+0.230 0.280 0.350 rg
+/F1 10 Tf
+480 130 Td
+(Included) Tj
+ET
+BT
+0.060 0.110 0.180 rg
+/F2 12 Tf
+460 108 Td
+(Rs 7497.00) Tj
+ET
+q
+0.840 0.880 0.930 RG
+0.800 w
+42 132 m
+553 132 l
+S
+Q
+BT
+0.340 0.400 0.470 rg
+/F1 9 Tf
+42 112 Td
+(Thank you for shopping with ShopSphere.) Tj
+ET
+BT
+0.530 0.580 0.660 rg
+/F1 8 Tf
+42 98 Td
+(This invoice was generated from your order session and is ready for download or printing.) Tj
+ET
+q
+0.840 0.880 0.930 RG
+0.800 w
+42 56 m
+553 56 l
+S
+Q
+BT
+0.400 0.460 0.550 rg
+/F1 8 Tf
+42 40 Td
+(ShopSphere) Tj
+ET
+BT
+0.400 0.460 0.550 rg
+/F1 8 Tf
+507 40 Td
+(Page 1 of 1) Tj
+ET
+
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000003388 00000 n 
+0000003458 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+3533
+%%EOF
