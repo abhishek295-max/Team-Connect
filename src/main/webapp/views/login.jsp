@@ -7,11 +7,16 @@
 
     String error = request.getParameter("error");
     String registered = request.getParameter("registered");
+    String deleted = request.getParameter("deleted");
     String noticeText = null;
     if ("1".equals(registered)) {
         noticeText = "Registration completed successfully. You can sign in now.";
+    } else if ("1".equals(deleted)) {
+        noticeText = "Account deleted successfully.";
     } else if ("invalid".equals(error) || "1".equals(error)) {
         noticeText = "Invalid username or password.";
+    } else if ("account_delete_failed".equals(error)) {
+        noticeText = "Account could not be deleted. Try again.";
     }
     String contextPath = request.getContextPath();
 %>
@@ -477,7 +482,7 @@
                 <p>Use your account details to open the chat dashboard.</p>
 
                 <% if (noticeText != null) { %>
-                <div class="notice <%= "1".equals(registered) ? "" : "error" %>"><%= noticeText %></div>
+                <div class="notice <%= ("1".equals(registered) || "1".equals(deleted)) ? "" : "error" %>"><%= noticeText %></div>
                 <% } %>
 
                 <form class="form" action="<%= contextPath %>/login" method="post">

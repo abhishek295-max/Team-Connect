@@ -3,12 +3,14 @@ package dao;
 import model.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import util.DBConnection;
+import util.AttachmentUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.file.Files;
 
 public class UserDAO {
 
@@ -254,6 +256,67 @@ public class UserDAO {
         return 0;
     }
 
+    public boolean deleteAccount(int userId) {
+        if (userId <= 0) {
+            return false;
+        }
+
+        List<String> attachmentFiles = new ArrayList<>();
+
+        try (Connection con = DBConnection.getConnection()) {
+            if (con == null) {
+                return false;
+            }
+
+            ensureAttachmentTable(con);
+            con.setAutoCommit(false);
+
+            String attachmentSql =
+                    "SELECT DISTINCT a.stored_name " +
+                    "FROM messages m " +
+                    "LEFT JOIN message_attachments a ON a.message_id = m.id " +
+                    "WHERE (m.sender_id=? OR m.receiver_id=?) " +
+                    "AND a.stored_name IS NOT NULL " +
+                    "AND TRIM(a.stored_name) <> ''";
+
+            try (PreparedStatement ps = con.prepareStatement(attachmentSql)) {
+                ps.setInt(1, userId);
+                ps.setInt(2, userId);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        attachmentFiles.add(rs.getString("stored_name"));
+                    }
+                }
+            }
+
+            try (PreparedStatement ps = con.prepareStatement(
+                    "DELETE FROM messages WHERE sender_id=? OR receiver_id=?")) {
+                ps.setInt(1, userId);
+                ps.setInt(2, userId);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = con.prepareStatement(
+                    "DELETE FROM users WHERE id=?")) {
+                ps.setInt(1, userId);
+                int deleted = ps.executeUpdate();
+                if (deleted <= 0) {
+                    con.rollback();
+                    return false;
+                }
+            }
+
+            con.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        cleanupAttachmentFiles(attachmentFiles);
+        return true;
+    }
+
     private boolean usernameExists(Connection con,
                                    String username) throws Exception {
 
@@ -348,5 +411,18 @@ public class UserDAO {
 
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
+    }
+
+    private void cleanupAttachmentFiles(List<String> storedNames) {
+        if (storedNames == null || storedNames.isEmpty()) {
+            return;
+        }
+
+        for (String storedName : storedNames) {
+            try {
+                Files.deleteIfExists(AttachmentUtil.resolveStoredPath(storedName));
+            } catch (Exception ignored) {
+            }
+        }
     }
 }

@@ -173,6 +173,10 @@
             justify-content: flex-end;
         }
 
+        .account-delete-form {
+            display: inline-flex;
+        }
+
         .chip {
             display: inline-flex;
             align-items: center;
@@ -723,6 +727,12 @@
             border-color: rgba(255, 255, 255, 0.12);
         }
 
+        .btn-danger {
+            background: rgba(248, 113, 113, 0.12);
+            color: var(--danger);
+            border-color: rgba(248, 113, 113, 0.20);
+        }
+
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -824,6 +834,10 @@
             .topbar-meta .btn {
                 width: 100%;
                 justify-content: center;
+            }
+
+            .account-delete-form {
+                width: 100%;
             }
 
             .stats-row,
@@ -933,6 +947,10 @@
                     <strong><%= WebUtil.escapeHtml(username) %></strong>
                     <span><%= WebUtil.escapeHtml(email) %></span>
                 </div>
+                <form class="account-delete-form" action="<%= contextPath %>/deleteAccount" method="post"
+                      onsubmit="return confirm('Delete your account permanently? This cannot be undone.');">
+                    <button class="btn btn-danger" type="submit">Delete account</button>
+                </form>
                 <a class="btn btn-secondary" href="<%= contextPath %>/logout">Logout</a>
             </div>
         </header>
