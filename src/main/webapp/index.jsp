@@ -1,10 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
-    if (session != null && session.getAttribute("userId") != null) {
-        response.sendRedirect(request.getContextPath() + "/chat");
-        return;
-    }
-
     String contextPath = request.getContextPath();
 %>
 <!DOCTYPE html>
@@ -696,6 +691,147 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        /* Premium motion layer */
+        .page {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+        }
+        .page::before,
+        .page::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(10px);
+            opacity: .65;
+            animation: ambientFloat 12s ease-in-out infinite alternate;
+        }
+        .page::before {
+            top: 70px;
+            right: -180px;
+            background: radial-gradient(circle, rgba(96,165,250,.28), rgba(96,165,250,0) 68%);
+        }
+        .page::after {
+            top: 520px;
+            left: -230px;
+            background: radial-gradient(circle, rgba(45,212,191,.18), rgba(45,212,191,0) 68%);
+            animation-delay: -5s;
+        }
+        @keyframes ambientFloat {
+            from { transform: translate3d(0, 0, 0) scale(1); }
+            to { transform: translate3d(22px, 28px, 0) scale(1.08); }
+        }
+        .hero {
+            position: relative;
+            padding-top: 76px;
+        }
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -40px;
+            right: 8%;
+            width: 520px;
+            height: 520px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(37,99,235,.14), rgba(37,99,235,0) 68%);
+            pointer-events: none;
+            animation: heroGlow 7s ease-in-out infinite alternate;
+        }
+        @keyframes heroGlow {
+            from { transform: scale(.92); opacity: .55; }
+            to { transform: scale(1.08); opacity: 1; }
+        }
+        .hero-grid > section:first-child { animation: heroEnter .9s .15s both cubic-bezier(.22,1,.36,1); }
+        .hero-grid > aside { position: relative; animation: heroEnter .9s .3s both cubic-bezier(.22,1,.36,1); }
+        @keyframes heroEnter {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-mock {
+            position: relative;
+            z-index: 2;
+            background: rgba(221,225,230,.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 28px 70px rgba(37,99,235,.14), 0 2px 0 rgba(255,255,255,.55) inset;
+            animation: mockFloat 6s ease-in-out infinite;
+            transform-style: preserve-3d;
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+        .chat-mock:hover { box-shadow: 0 34px 84px rgba(37,99,235,.2), 0 2px 0 rgba(255,255,255,.65) inset; }
+        @keyframes mockFloat {
+            0%, 100% { transform: translateY(0) rotateX(0deg); }
+            50% { transform: translateY(-8px) rotateX(.6deg); }
+        }
+        .chat-mock::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(115deg, rgba(255,255,255,.34), transparent 32%, transparent 70%, rgba(96,165,250,.08));
+        }
+        .floating-card {
+            position: absolute;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 164px;
+            padding: 10px 12px;
+            border: 1px solid rgba(255,255,255,.72);
+            border-radius: 14px;
+            background: rgba(255,255,255,.76);
+            box-shadow: 0 14px 30px rgba(17,24,39,.1);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            animation: cardFloat 5s ease-in-out infinite;
+        }
+        .floating-card-one { top: 12%; left: -48px; }
+        .floating-card-two { right: -38px; bottom: 15%; animation-delay: -2.2s; }
+        .floating-card strong { display: block; font-size: 11.5px; color: var(--text); }
+        .floating-card small { display: block; margin-top: 3px; color: var(--text-mute); font-size: 10px; white-space: nowrap; }
+        .mini-icon { width: 25px; height: 25px; border-radius: 9px; display: grid; place-items: center; flex: 0 0 auto; color: #fff; font-size: 12px; background: linear-gradient(135deg, var(--primary), #7c3aed); }
+        .floating-card-two .mini-icon { background: linear-gradient(135deg, #10b981, #14b8a6); }
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-9px) rotate(1deg); }
+        }
+        .badge { box-shadow: 0 6px 18px rgba(37,99,235,.06); }
+        .badge .dot { animation: livePulse 1.8s ease-out infinite; }
+        @keyframes livePulse {
+            0% { box-shadow: 0 0 0 0 rgba(16,185,129,.45); }
+            70% { box-shadow: 0 0 0 7px rgba(16,185,129,0); }
+            100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+        }
+        .feature-card, .testimonial-card, .panel, .stat-item { position: relative; overflow: hidden; }
+        .feature-card::after, .testimonial-card::after, .panel::after, .stat-item::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 70%;
+            height: 100%;
+            pointer-events: none;
+            transform: skewX(-18deg);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+            transition: left .7s ease;
+        }
+        .feature-card:hover::after, .testimonial-card:hover::after, .panel:hover::after, .stat-item:hover::after { left: 130%; }
+        @media (max-width: 760px) {
+            .hero { padding-top: 48px; }
+            .floating-card-one { left: 8px; top: -18px; }
+            .floating-card-two { right: 8px; bottom: -20px; }
+            .chat-mock { margin-top: 30px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .page::before, .page::after, .hero::before, .hero-grid > section:first-child,
+            .hero-grid > aside, .chat-mock, .floating-card, .badge .dot { animation: none; }
+        }
     </style>
 </head>
 <body class="loading">
@@ -721,8 +857,7 @@
                 </div>
                 <nav class="nav">
                     <a href="#about" class="button button-ghost">About</a>
-                    <a href="<%= contextPath %>/views/login.jsp" class="button button-ghost">Login</a>
-                    <a href="<%= contextPath %>/views/register.jsp" class="button button-primary">Get Started</a>
+                    <a href="<%= contextPath %>/views/register.jsp" class="button button-ghost">Login</a>
                 </nav>
             </header>
 
@@ -733,13 +868,12 @@
                         <h1>Chat smarter.<br><span class="accent">Connect faster.</span></h1>
                         <p class="hero-copy">
                             TeamConnect is a complete messaging platform built with JSP and Servlet technology.
-                            Create an account, add contacts, and start chatting instantly with live message delivery,
+                            Sign in, connect with your team, and start chatting instantly with live message delivery,
                             photo and file sharing, searchable chat history, and a dashboard that keeps every
                             conversation organized in one place.
                         </p>
                         <div class="hero-actions">
-                            <a href="<%= contextPath %>/views/login.jsp" class="button button-primary">Login to Dashboard</a>
-                            <a href="<%= contextPath %>/views/register.jsp" class="button button-ghost">Create Account</a>
+                            <a href="<%= contextPath %>/views/register.jsp" class="button button-primary">Login to Dashboard</a>
                         </div>
                         <div class="hero-stats">
                             <div class="stat">
@@ -799,6 +933,14 @@
                                 </div>
                             </div>
                             <div class="chat-mock-input"><i class="fa-regular fa-face-smile"></i> Type a message... <i class="fa-solid fa-paper-plane" style="margin-left:auto;"></i></div>
+                        </div>
+                        <div class="floating-card floating-card-one">
+                            <span class="mini-icon"><i class="fa-solid fa-bolt"></i></span>
+                            <div><strong>Live delivery</strong><small>Messages synced instantly</small></div>
+                        </div>
+                        <div class="floating-card floating-card-two">
+                            <span class="mini-icon"><i class="fa-solid fa-shield-halved"></i></span>
+                            <div><strong>Protected workspace</strong><small>Private by design</small></div>
                         </div>
                     </aside>
                 </div>
@@ -1107,7 +1249,7 @@
                         <p>Join hundreds of teams already using TeamConnect for seamless, secure, and scalable messaging. Get started in minutes.</p>
                         <div class="cta-buttons">
                             <a href="<%= contextPath %>/views/register.jsp" class="button button-primary" style="min-height: 46px; font-size: 15px; padding: 0 30px;">
-                                Start Free Trial
+                                Sign in to TeamConnect
                             </a>
                             <a href="#about" class="button button-ghost" style="min-height: 46px; font-size: 15px; padding: 0 30px;">
                                 Learn More
@@ -1226,6 +1368,22 @@
         }, { threshold: 0.4 });
         statsObserver.observe(statsSection);
     }
+
+    (function enableHeroTilt() {
+        var mock = document.querySelector('.chat-mock');
+        var aside = document.querySelector('.hero-grid > aside');
+        if (!mock || !aside || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        aside.addEventListener('mousemove', function (event) {
+            if (window.innerWidth < 900) return;
+            var rect = aside.getBoundingClientRect();
+            var x = (event.clientX - rect.left) / rect.width - 0.5;
+            var y = (event.clientY - rect.top) / rect.height - 0.5;
+            mock.style.transform = 'perspective(900px) rotateY(' + (x * 4) + 'deg) rotateX(' + (-y * 3) + 'deg) translateY(-4px)';
+        });
+        aside.addEventListener('mouseleave', function () {
+            mock.style.transform = '';
+        });
+    })();
 </script>
 </body>
 </html>

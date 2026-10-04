@@ -1,501 +1,673 @@
-﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
-    if (session != null && session.getAttribute("userId") != null) {
-        response.sendRedirect(request.getContextPath() + "/chat");
-        return;
-    }
-
-    String error = request.getParameter("error");
-    String noticeText = null;
-    if ("invalid_input".equals(error)) {
-        noticeText = "Fill username, email, and password before creating the account.";
-    } else if ("username_taken".equals(error)) {
-        noticeText = "That username is already in use. Pick a different one.";
-    } else if ("email_taken".equals(error)) {
-        noticeText = "That email is already registered. Use another email or log in.";
-    } else if ("database_unavailable".equals(error)) {
-        noticeText = "Database connection is not available right now. Try again shortly.";
-    } else if ("database_error".equals(error) || "1".equals(error)) {
-        noticeText = "Registration failed. Check the details and try again.";
-    }
-
-    String contextPath = request.getContextPath();
+if (session != null && Boolean.TRUE.equals(session.getAttribute("adminAuthenticated"))) { response.sendRedirect(request.getContextPath() + "/admin"); return; }
+if (session != null && session.getAttribute("userId") != null) { response.sendRedirect(request.getContextPath() + "/chat"); return; }
+String contextPath=request.getContextPath(), error=request.getParameter("error"), registered=request.getParameter("registered"), deleted=request.getParameter("deleted");
+String message=null; boolean messageIsError=false;
+if ("1".equals(registered)) message="Registration completed successfully. You can sign in now.";
+else if ("1".equals(deleted)) message="Account deleted successfully.";
+else if ("invalid".equals(error)||"1".equals(error)) {message="Invalid username or password.";messageIsError=true;}
+else if ("username_exists".equals(error)) {message="That username is already in use.";messageIsError=true;}
+else if ("email_exists".equals(error)) {message="That email address is already registered.";messageIsError=true;}
+else if ("admin_login_route".equals(error)) {message="Administrator accounts must sign in from the separate /admin panel.";messageIsError=true;}
+else if (error!=null) {message="The request could not be completed. Please try again.";messageIsError=true;}
 %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | TeamConnect</title>
+
+
+    <title>Get Started</title>
+
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+       * {
+           margin: 0;
+           padding: 0;
+           box-sizing: border-box;
+           font-family: "Segoe UI", Arial, sans-serif;
+       }
 
-        :root {
-            --bg:            #020818;
-            --bg-2:          #030E22;
-            --text:          #F1F5F9;
-            --muted:         #94A3B8;
-            --muted-dim:     #64748B;
-            --border:        rgba(59, 130, 246, 0.16);
-            --shadow:        0 28px 72px rgba(0, 0, 0, 0.65);
-            --blue:          #2563EB;
-            --blue-mid:      #3B82F6;
-            --blue-light:    #60A5FA;
-            --blue-glow:     #93C5FD;
-            --silver:        #CBD5E1;
-            --silver-dim:    #94A3B8;
-            --silver-bright: #F1F5F9;
-            --danger:        #F87171;
-            --grad-text:     linear-gradient(120deg, #F1F5F9 10%, #93C5FD 50%, #60A5FA 90%);
+       body {
+           min-height: 100vh;
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           background: #f3f5f8;
+           padding: 20px;
+       }
+
+
+
+       .auth-container {
+           width: 950px;
+           height: 570px;
+           background: #ffffff;
+           border-radius: 22px;
+           overflow: hidden;
+           position: relative;
+           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+       }
+
+
+
+       .auth-wrapper {
+           width: 200%;
+           height: 100%;
+           display: flex;
+           transition: transform 0.75s cubic-bezier(0.65, 0, 0.35, 1);
+       }
+
+       .auth-container.register-active .auth-wrapper {
+           transform: translateX(-50%);
+       }
+
+
+
+       .auth-page {
+           width: 50%;
+           height: 100%;
+           display: flex;
+           flex-shrink: 0;
+       }
+
+
+
+       .image-section {
+           width: 50%;
+           height: 100%;
+           position: relative;
+           overflow: hidden;
+           background: #222;
+       }
+
+        .auth-page:first-child .image-section {
+            background: #222 url("https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=85") center / cover no-repeat;
         }
 
-        * { box-sizing: border-box; }
-
-        html, body {
-            margin: 0; min-height: 100%;
-            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-            color: var(--text);
-            background: var(--bg);
-            overflow-x: hidden;
+        .auth-page:first-child .image-section img {
+            visibility: hidden !important;
         }
-        body {
-            min-height: 100vh;
+
+        .auth-page:not(:first-child) .image-section img {
+            visibility: visible;
+        }
+
+        .image-section img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+
+            transition:
+                    transform 1s ease,
+                    filter 0.8s ease;
+        }
+
+        .auth-container.register-active
+        .auth-page:first-child
+        .image-section img {
+           transform: scale(1.06);
+           filter: brightness(0.85);
+       }
+
+        .image-overlay {
+            position: absolute;
+            inset: 0;
+
             background:
-                    radial-gradient(ellipse 90% 60% at 8% -10%, rgba(37,99,235,0.26) 0%, transparent 52%),
-                    radial-gradient(ellipse 70% 55% at 94%  8%, rgba(96,165,250,0.15) 0%, transparent 48%),
-                    radial-gradient(ellipse 75% 55% at 50% 112%, rgba(59,130,246,0.11) 0%, transparent 55%),
-                    linear-gradient(180deg, #020818 0%, #030D20 55%, #020818 100%);
-        }
+                    linear-gradient(
+                            180deg,
+                            rgba(0, 0, 0, 0.05),
+                            rgba(0, 0, 0, 0.40)
+                    );
 
-        /* Aurora */
-        body::before {
-            content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background:
-                    radial-gradient(ellipse 680px 400px at 12% 22%, rgba(37,99,235,0.09) 0%, transparent 70%),
-                    radial-gradient(ellipse 540px 360px at 88% 78%, rgba(96,165,250,0.07) 0%, transparent 70%);
-            animation: auroraShift 22s ease-in-out infinite alternate;
-        }
-        @keyframes auroraShift {
-            0%   { transform: translate(0,0) scale(1); }
-            50%  { transform: translate(-28px,18px) scale(1.05); }
-            100% { transform: translate(22px,-26px) scale(0.97); }
-        }
+           display: flex;
+           flex-direction: column;
+           justify-content: flex-end;
 
-        /* Grid */
-        body::after {
-            content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background-image:
-                    linear-gradient(rgba(59,130,246,0.045) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(59,130,246,0.045) 1px, transparent 1px);
-            background-size: 70px 70px;
-            mask-image: radial-gradient(ellipse 85% 75% at 50% 50%, black 15%, transparent 80%);
-        }
+           padding: 45px;
+           color: white;
+       }
 
-        a { color: inherit; text-decoration: none; }
+       .image-overlay h1 {
+           font-size: 38px;
+           font-weight: 600;
+           margin-bottom: 12px;
+       }
 
-        .page { min-height: 100vh; padding: 18px; position: relative; z-index: 1; }
+       .image-overlay p {
+           font-size: 15px;
+           line-height: 1.6;
+           max-width: 330px;
+           color: rgba(255, 255, 255, 0.85);
+       }
 
-        .shell {
-            width: min(1180px, 100%);
-            min-height: calc(100vh - 36px);
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 0.96fr 1.04fr;
-            gap: 20px;
-        }
 
-        .panel {
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            background: rgba(3, 10, 28, 0.74);
-            backdrop-filter: blur(26px) saturate(160%);
-            -webkit-backdrop-filter: blur(26px) saturate(160%);
-            box-shadow: 0 0 0 1px rgba(255,255,255,0.028) inset, var(--shadow);
-            overflow: hidden;
-            position: relative;
-        }
-        .panel::before {
-            content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px;
-            background: linear-gradient(135deg, rgba(37,99,235,0.45), rgba(148,163,184,0.18) 45%, rgba(96,165,250,0.3) 100%);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 0;
-        }
 
-        /* ── LEFT PANEL ───────────────────────────────── */
-        .left {
-            padding: 36px;
-            display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
-            position: relative; z-index: 1;
-        }
-        .left::after {
-            content: ""; position: absolute; bottom: -80px; right: -80px;
-            width: 360px; height: 360px;
-            background: conic-gradient(from 200deg, rgba(37,99,235,0.28), rgba(96,165,250,0.22), rgba(203,213,225,0.14), rgba(37,99,235,0.28));
-            border-radius: 50%; filter: blur(68px); opacity: 0.45;
-            animation: float 13s ease-in-out infinite; pointer-events: none;
-        }
-        @keyframes float {
-            0%, 100% { transform: translate3d(0,0,0) rotate(0deg); }
-            50%       { transform: translate3d(-16px,-12px,0) rotate(5deg); }
-        }
+       .form-section {
+           width: 50%;
+           height: 100%;
 
-        .brand-row { display: flex; align-items: center; gap: 14px; }
-        .brand-badge {
-            width: 50px; height: 50px; border-radius: 16px;
-            display: grid; place-items: center;
-            font-weight: 900; font-size: 14px; color: #fff;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(145deg, var(--blue), var(--blue-light));
-            box-shadow: 0 10px 28px rgba(37,99,235,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset;
-            position: relative; overflow: hidden; flex: 0 0 auto;
-        }
-        .brand-badge::after {
-            content: ""; position: absolute; inset: 0;
-            background: linear-gradient(135deg, transparent 0 35%, rgba(255,255,255,0.28) 36%, transparent 37% 100%);
-            transform: translateX(-100%); animation: sheen 5s ease infinite;
-        }
-        @keyframes sheen {
-            0% { transform: translateX(-100%); }
-            28%, 100% { transform: translateX(220%); }
-        }
-        .brand-row strong {
-            display: block; font-size: 18px;
-            font-family: 'Poppins', sans-serif; font-weight: 800;
-            background: var(--grad-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .brand-row span { display: block; margin-top: 3px; color: var(--muted-dim); font-size: 12px; }
+           display: flex;
+           justify-content: center;
+           align-items: center;
 
-        .hero { max-width: 620px; }
+           padding: 45px;
+       }
 
-        .eyebrow {
-            display: inline-flex; align-items: center; gap: 10px;
-            padding: 8px 14px; width: fit-content; border-radius: 999px;
-            background: rgba(37,99,235,0.1);
-            border: 1px solid rgba(59,130,246,0.24);
-            color: var(--blue-glow); font-size: 13px; font-weight: 500;
-        }
-        .eyebrow i {
-            width: 8px; height: 8px; border-radius: 999px;
-            background: var(--silver-bright);
-            box-shadow: 0 0 0 0 rgba(241,245,249,0.5);
-            animation: pulse 2s infinite; flex: 0 0 auto;
-        }
+       .form-content {
+           width: 100%;
+           max-width: 350px;
 
-        h1 {
-            margin: 20px 0 0;
-            font-size: clamp(38px, 4.8vw, 62px);
-            line-height: 0.97; letter-spacing: -0.03em;
-            font-family: 'Poppins', sans-serif; font-weight: 800;
-            background: var(--grad-text);
-            background-size: 200% auto;
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation: shine 9s linear infinite;
-        }
-        @keyframes shine { to { background-position: 200% center; } }
+           animation: formAppear 0.8s ease;
+       }
 
-        .hero p { margin: 16px 0 0; color: var(--muted); line-height: 1.78; font-size: 15px; }
+       @keyframes formAppear {
+           from {
+               opacity: 0;
+               transform: translateY(15px);
+           }
 
-        .metrics {
-            display: grid; grid-template-columns: repeat(2, minmax(0,1fr));
-            gap: 12px; margin-top: 22px;
-        }
-        .metric {
-            padding: 16px; border-radius: 20px;
-            background: rgba(37,99,235,0.05);
-            border: 1px solid rgba(59,130,246,0.13);
-            transition: transform .3s ease, border-color .3s ease;
-        }
-        .metric:hover { transform: translateY(-4px); border-color: rgba(96,165,250,0.35); }
-        .metric span { display: block; color: var(--muted-dim); font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; }
-        .metric strong {
-            display: block; margin-top: 8px; font-size: 20px;
-            font-family: 'Poppins', sans-serif; font-weight: 700;
-            background: linear-gradient(120deg, var(--silver), var(--blue-glow));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+           to {
+               opacity: 1;
+               transform: translateY(0);
+           }
+       }
 
-        /* ── RIGHT / AUTH ─────────────────────────────── */
-        .auth-right {
-            padding: 28px; display: flex; align-items: center;
-            position: relative; z-index: 1;
-        }
+       .logo {
+           width: 45px;
+           height: 45px;
 
-        .auth-card {
-            width: 100%; padding: 32px; border-radius: 22px;
-            background: rgba(2, 8, 22, 0.72);
-            border: 1px solid rgba(59,130,246,0.18);
-            box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.025) inset;
-            position: relative; overflow: hidden;
-        }
-        .auth-card::before {
-            content: ""; position: absolute; top: -60px; right: -60px;
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(37,99,235,0.2), transparent 70%);
-            pointer-events: none;
-        }
+           border-radius: 12px;
 
-        .auth-card h2 {
-            margin: 0; font-size: 28px;
-            font-family: 'Poppins', sans-serif; font-weight: 700;
-            background: var(--grad-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .auth-card > p { margin: 10px 0 0; color: var(--muted); line-height: 1.7; font-size: 14px; }
+           display: flex;
+           justify-content: center;
+           align-items: center;
 
-        .notice {
-            margin-top: 18px; padding: 12px 16px; border-radius: 14px;
-            border: 1px solid rgba(248,113,113,0.22);
-            background: rgba(248,113,113,0.08);
-            color: var(--danger); font-size: 14px; font-weight: 500;
-        }
+           background: #111827;
+           color: white;
 
-        .form { display: grid; gap: 14px; margin-top: 24px; }
+           font-size: 20px;
+           font-weight: 600;
 
-        .field { display: grid; gap: 8px; }
-        .field label {
-            color: var(--silver-dim); font-size: 12px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.07em;
-        }
-        .field input {
-            width: 100%; min-height: 50px;
-            border-radius: 14px; padding: 0 16px;
-            border: 1px solid rgba(59,130,246,0.18);
-            background: rgba(37,99,235,0.06);
-            color: var(--text); outline: none; font-size: 15px;
-            font-family: 'Inter', sans-serif;
-            transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
-        }
-        .field input::placeholder { color: var(--muted-dim); }
-        .field input:focus {
-            border-color: rgba(96,165,250,0.6);
-            background: rgba(37,99,235,0.1);
-            box-shadow: 0 0 0 4px rgba(37,99,235,0.14), 0 0 20px rgba(37,99,235,0.1);
-        }
+           margin-bottom: 22px;
+       }
 
-        .button {
-            display: inline-flex; align-items: center; justify-content: center;
-            min-height: 50px; border: 0; border-radius: 14px; cursor: pointer;
-            transition: transform .2s ease, box-shadow .2s ease;
-            white-space: nowrap; font-weight: 600; font-size: 15px;
-            font-family: 'Inter', sans-serif; position: relative; overflow: hidden;
-        }
-        .button:hover { transform: translateY(-2px); }
-        .button:active { transform: translateY(0); }
+       .form-content h2 {
+           font-size: 30px;
+           color: #171717;
+           margin-bottom: 8px;
+       }
 
-        .button-primary {
-            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
-            color: #fff; width: 100%;
-            box-shadow: 0 10px 28px rgba(37,99,235,0.42);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        .button-primary:hover { box-shadow: 0 14px 36px rgba(37,99,235,0.58); }
-        .button-primary::after {
-            content: ""; position: absolute; inset: 0;
-            background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.16) 50%, transparent 70%);
-            transform: translateX(-100%); transition: transform .45s ease;
-        }
-        .button-primary:hover::after { transform: translateX(100%); }
+       .subtitle {
+           color: #777;
+           font-size: 14px;
+           margin-bottom: 28px;
+       }
 
-        .button-ghost {
-            background: rgba(37,99,235,0.07); color: var(--silver); width: 100%;
-            border: 1px solid rgba(59,130,246,0.22);
-        }
-        .button-ghost:hover {
-            border-color: rgba(96,165,250,0.45);
-            background: rgba(37,99,235,0.13); color: #fff;
-            box-shadow: 0 0 22px rgba(37,99,235,0.15);
-        }
+       /* =========================
+          INPUTS
+       ========================= */
 
-        .action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+       .input-group {
+           margin-bottom: 17px;
+       }
 
-        .micro { margin-top: 18px; color: var(--muted-dim); line-height: 1.7; font-size: 13px; }
-        .micro a { color: var(--blue-glow); text-decoration: underline; text-underline-offset: 3px; }
-        .micro a:hover { color: #fff; }
+       .input-group label {
+           display: block;
+           font-size: 13px;
+           font-weight: 600;
+           color: #444;
+           margin-bottom: 7px;
+       }
 
-        .feature-list { display: grid; gap: 10px; margin-top: 24px; }
-        .feature {
-            padding: 16px; border-radius: 16px;
-            background: rgba(37,99,235,0.05);
-            border: 1px solid rgba(59,130,246,0.12);
-            transition: transform .3s ease, border-color .3s ease, background .3s ease;
-        }
-        .feature:hover {
-            transform: translateY(-3px);
-            border-color: rgba(96,165,250,0.35);
-            background: rgba(37,99,235,0.09);
-        }
-        .feature strong { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: var(--silver-bright); }
-        .feature span { color: var(--muted); font-size: 14px; line-height: 1.58; }
+       .input-group input {
+           width: 100%;
+           height: 48px;
 
-        .pulse-bar {
-            height: 3px; border-radius: 999px; margin-top: 20px;
-            background: linear-gradient(90deg, var(--blue) 0%, var(--silver) 50%, var(--blue-light) 100%);
-            background-size: 200% 100%;
-            animation: sweep 2.8s linear infinite;
-            position: relative;
-        }
-        .pulse-bar::after {
-            content: ""; position: absolute; inset: -3px; border-radius: 999px;
-            background: inherit; filter: blur(5px); opacity: 0.5;
-        }
+           padding: 0 15px;
 
-        @keyframes pulse {
-            0%   { box-shadow: 0 0 0 0   rgba(241,245,249,0.55); }
-            70%  { box-shadow: 0 0 0 10px rgba(241,245,249,0); }
-            100% { box-shadow: 0 0 0 0   rgba(241,245,249,0); }
-        }
-        @keyframes sweep { from { background-position: 0 50%; } to { background-position: 200% 50%; } }
+           border: 1px solid #ddd;
+           border-radius: 9px;
 
-        @media (max-width: 1040px) { .shell { grid-template-columns: 1fr; } }
-        @media (max-width: 680px) {
-            .page { padding: 12px; }
-            .shell {
-                min-height: auto;
-                gap: 12px;
-            }
+           outline: none;
 
-            .left {
-                display: none;
-            }
+           font-size: 14px;
+           color: #222;
 
-            .auth-right {
-                padding: 0;
-                align-items: stretch;
-            }
+           transition: 0.25s ease;
+       }
 
-            .auth-card {
-                padding: 20px;
-                border-radius: 22px;
-            }
+       .input-group input:focus {
+           border-color: #222;
 
-            .auth-card h2 {
-                font-size: 24px;
-            }
+           box-shadow:
+                   0 0 0 3px rgba(0, 0, 0, 0.05);
+       }
 
-            .auth-card > p,
-            .micro {
-                font-size: 12px;
-                line-height: 1.6;
-            }
 
-            .action-row {
-                margin-top: 12px;
-            }
 
-            .action-row .button {
-                width: 100%;
-            }
+       .form-options {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
 
-            .field input,
-            .button {
-                min-height: 48px;
-            }
+           margin: 4px 0 22px;
 
-            .metrics { grid-template-columns: 1fr; }
-            .form { gap: 12px; margin-top: 18px; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
+           font-size: 13px;
+       }
+
+       .remember {
+           display: flex;
+           align-items: center;
+           gap: 7px;
+           color: #666;
+       }
+
+       .remember input {
+           accent-color: #111;
+       }
+
+       .forgot {
+           color: #222;
+           text-decoration: none;
+           font-weight: 600;
+       }
+
+
+
+       .submit-btn {
+           width: 100%;
+           height: 48px;
+
+           border: none;
+           border-radius: 9px;
+
+           background: #111827;
+           color: white;
+
+           font-size: 15px;
+           font-weight: 600;
+
+           cursor: pointer;
+
+           transition:
+                   transform 0.2s ease,
+                   box-shadow 0.2s ease,
+                   background 0.2s ease;
+       }
+
+       .submit-btn:hover {
+           background: #000;
+           transform: translateY(-2px);
+
+           box-shadow:
+                   0 8px 20px rgba(0, 0, 0, 0.15);
+       }
+
+       .submit-btn:active {
+           transform: translateY(0);
+       }
+
+
+
+       .switch-text {
+           text-align: center;
+           margin-top: 23px;
+
+           font-size: 13px;
+           color: #777;
+       }
+
+       .switch-text button {
+           border: none;
+           background: none;
+
+           color: #111827;
+
+           font-weight: 700;
+           cursor: pointer;
+
+           margin-left: 4px;
+       }
+
+       .switch-text button:hover {
+           text-decoration: underline;
+       }
+
+
+
+       .register-page {
+           flex-direction: row-reverse;
+       }
+
+
+
+       @media (max-width: 800px) {
+
+           body {
+               padding: 15px;
+           }
+
+           .auth-container {
+               height: auto;
+               min-height: 600px;
+           }
+
+           .auth-page {
+               flex-direction: column;
+               height: 100%;
+           }
+
+           .image-section {
+               width: 100%;
+               height: 220px;
+           }
+
+           .form-section {
+               width: 100%;
+               min-height: 400px;
+               padding: 35px 25px;
+           }
+
+           .image-overlay {
+               padding: 25px;
+           }
+
+           .image-overlay h1 {
+               font-size: 27px;
+           }
+
+           .image-overlay p {
+               display: none;
+           }
+       }
+
+       @media (max-width: 500px) {
+
+           .auth-container {
+               border-radius: 15px;
+           }
+
+           .image-section {
+               height: 180px;
+           }
+
+           .form-section {
+               padding: 30px 22px;
+           }
+
+           .form-content h2 {
+               font-size: 26px;
+           }
+
+           .form-options {
+               font-size: 12px;
+           }
+       }
+
+
+       .auth-page.register-page{display:none!important}.auth-page:first-child .switch-text{display:none!important}
     </style>
-</head>
-<body>
-<script>
-    if ("scrollRestoration" in history) {
-        history.scrollRestoration = "manual";
-    }
-    window.addEventListener("load", function () {
-        window.scrollTo(0, 0);
-    });
-</script>
-<div class="page">
-    <div class="shell">
-        <section class="panel left">
-            <div>
-                <div class="brand-row">
-                    <div class="brand-badge">TC</div>
-                    <div>
-                        <strong>TeamConnect</strong>
-                        <span>Secure team collaboration with real-time messaging</span>
-                    </div>
-                </div>
 
-                <div class="hero">
-                    <div class="eyebrow"><i></i> Create your account in one step</div>
-                    <h1>Build your chat profile.</h1>
+
+</head>
+
+<body>
+
+
+<div class="auth-container" id="authContainer">
+
+    <div th:if="${loginError}" th:text="${loginError}" class="auth-message error"></div>
+    <div th:if="${registerError}" th:text="${registerError}" class="auth-message error"></div>
+    <div th:if="${success}" th:text="${success}" class="auth-message success"></div>
+
+    <div class="auth-wrapper">
+
+
+
+
+        <div class="auth-page">
+
+
+
+            <div class="image-section">
+
+                <img
+                        src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1000&q=80"
+                        alt="Workspace"
+                >
+
+                <div class="image-overlay">
+
+                    <h1>Welcome back.</h1>
+
                     <p>
-                        Register once to open the dashboard, pick contacts, and start threaded conversations with a
-                        polished interface that feels close to a real product.
+                        Sign in to continue to your account
+                        and stay connected with your workspace.
                     </p>
 
-                    <div class="metrics">
-                        <div class="metric">
-                            <span>Security</span>
-                            <strong>Hashed</strong>
+                </div>
+
+            </div>
+
+
+
+
+            <div class="form-section">
+
+                <div class="form-content">
+
+                    <div class="logo">
+                        TC
+                    </div>
+
+                    <h2>Sign in</h2>
+
+                    <p class="subtitle">
+                        Welcome back! Please enter your details.
+                    </p>
+
+
+                    <form method="post" action="/login">
+
+                        <div class="input-group">
+
+                            <label>Username</label>
+
+                            <input
+                                    type="text"
+                                    name="username"
+                                    placeholder="Enter your username"
+                                    required
+                            >
+
                         </div>
-                        <div class="metric">
-                            <span>Experience</span>
-                            <strong>Modern</strong>
+
+
+                        <div class="input-group">
+
+                            <label>Password</label>
+
+                            <input
+                                    type="password"
+                                    name="password"
+                                    placeholder="Enter your password"
+                                    required
+                            >
+
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            <div>
-                <div class="feature-list">
-                    <div class="feature">
-                        <strong>Quick onboarding</strong>
-                        <span>Get in, create an account, and move directly to the dashboard.</span>
-                    </div>
-                    <div class="feature">
-                        <strong>Clean interface</strong>
-                        <span>Glass panels, clear spacing, and responsive inputs keep the form readable.</span>
-                    </div>
-                </div>
-                <div class="pulse-bar"></div>
-            </div>
-        </section>
 
-        <aside class="panel auth-right">
-            <div class="auth-card">
-                <h2>Register</h2>
-                <p>Create your account to enter the chat workspace.</p>
+                        <div class="form-options">
 
-                <% if (noticeText != null) { %>
-                <div class="notice"><%= noticeText %></div>
-                <% } %>
+                            <label class="remember">
 
-                <form class="form" action="<%= contextPath %>/register" method="post">
-                    <div class="field">
-                        <label for="username">Username</label>
-                        <input id="username" type="text" name="username" autocomplete="username" required>
-                    </div>
+                                <input type="checkbox">
 
-                    <div class="field">
-                        <label for="email">Email</label>
-                        <input id="email" type="email" name="email" autocomplete="email" required>
-                    </div>
+                                Remember me
 
-                    <div class="field">
-                        <label for="password">Password</label>
-                        <input id="password" type="password" name="password" autocomplete="new-password" required>
+                            </label>
+
+                            <a href="#" class="forgot">
+                                Forgot password?
+                            </a>
+
+                        </div>
+
+
+                        <button type="submit" class="submit-btn">
+                            Sign in
+                        </button>
+
+                    </form>
+
+
+                    <div class="switch-text">
+
+                        Don't have an account?
+
+                        <button
+                                type="button"
+                                onclick="showRegister()"
+                        >
+                            Create account
+                        </button>
+
                     </div>
 
-                    <button class="button button-primary" type="submit">Create account</button>
-                </form>
-
-                <div class="action-row">
-                    <a class="button button-ghost" href="<%= contextPath %>/views/login.jsp">Back to login</a>
                 </div>
 
-                <p class="micro">Already have an account? <a href="<%= contextPath %>/views/login.jsp">Login here</a>.</p>
             </div>
-        </aside>
+
+        </div>
+
+
+
+
+        <div class="auth-page register-page" id="registerPage">
+
+
+
+            <div class="image-section">
+
+                <img
+                        src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1000&q=80"
+                        alt="Team collaboration"
+                >
+
+                <div class="image-overlay">
+
+                    <h1>Join the team.</h1>
+
+                    <p>
+                        Create your account and start
+                        collaborating with your team.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+
+            <div class="form-section">
+
+                <div class="form-content">
+
+                    <div class="logo">
+                        A
+                    </div>
+
+                    <h2>Create account</h2>
+
+                    <p class="subtitle">
+                        Get started by creating your account.
+                    </p>
+
+
+                    <form method="post" action="/register">
+
+                        <div class="input-group">
+
+                            <label>Full name</label>
+
+                            <input
+                                    type="text"
+                                    name="username"
+                                    placeholder="Enter your full name"
+                                    required
+                            >
+
+                        </div>
+
+
+                        <div class="input-group">
+
+                            <label>Email</label>
+
+                            <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Enter your email"
+                                    required
+                            >
+
+                        </div>
+
+
+                        <div class="input-group">
+
+                            <label>Password</label>
+
+                            <input
+                                    type="password"
+                                    name="password"
+                                    placeholder="Create a password"
+                                    required
+                            >
+
+                        </div>
+
+
+                        <button type="submit" class="submit-btn">
+                            Create account
+                        </button>
+
+                    </form>
+
+
+                    <div class="switch-text">
+
+                        Already have an account?
+
+                        <button
+                                type="button"
+                                onclick="showLogin()"
+                        >
+                            Sign in
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
+
 </div>
+
+<script src="/assets/js/auth.js"></script>
+
+
+
 </body>
 </html>

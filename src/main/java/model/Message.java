@@ -1,5 +1,7 @@
 package model;
 
+import util.AttachmentUtil;
+
 import java.sql.Timestamp;
 
 public class Message {
@@ -104,8 +106,14 @@ public class Message {
         this.attachmentData = attachmentData;
     }
 
+    public String getAttachmentUrl() {
+        if (!hasAttachment()) {
+            return "";
+        }
+        return AttachmentUtil.downloadUrl(id);
+    }
+
     public boolean hasAttachment() {
         return attachmentStoredName != null && !attachmentStoredName.trim().isEmpty();
     }
-
 }

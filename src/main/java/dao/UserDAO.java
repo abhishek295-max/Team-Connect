@@ -116,7 +116,7 @@ public class UserDAO {
             }
 
             String sql =
-                    "SELECT id, username, email, password FROM users WHERE username=?";
+                    "SELECT id, username, email, password, status FROM users WHERE username=?";
 
             try (PreparedStatement ps =
                          con.prepareStatement(sql)) {
@@ -127,6 +127,10 @@ public class UserDAO {
                     if (rs.next()) {
                         String storedPassword =
                                 rs.getString("password");
+                        String status = rs.getString("status");
+                        if ("DISABLED".equalsIgnoreCase(status) || "SUSPENDED".equalsIgnoreCase(status)) {
+                            return null;
+                        }
                         User user = mapBasicUser(rs);
 
                         boolean matches =
