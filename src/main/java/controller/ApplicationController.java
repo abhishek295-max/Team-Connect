@@ -19,6 +19,10 @@ import service.AdminService;
 import service.MessageService;
 import service.UserService;
 import util.AttachmentUtil;
+import ems.service.EmsAiCommandService;
+import ems.service.EmsAccessService;
+import ems.model.Employee;
+import ems.service.EmsEmployeeService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,17 +41,26 @@ public class ApplicationController {
     private final GroupChatService groups;
     private final AdminService admin;
     private final ChatClient aiChatClient;
+    private final EmsAiCommandService emsAiCommands;
+    private final EmsAccessService emsAccess;
+    private final EmsEmployeeService emsEmployees;
 
     public ApplicationController(
             UserService users,
             MessageService messages,
             GroupChatService groups,
             AdminService admin,
-            ChatClient.Builder chatClientBuilder) {
+            ChatClient.Builder chatClientBuilder,
+            EmsAiCommandService emsAiCommands,
+            EmsAccessService emsAccess,
+            EmsEmployeeService emsEmployees) {
         this.users = users;
         this.messages = messages;
         this.groups = groups;
         this.admin = admin;
+        this.emsAiCommands = emsAiCommands;
+        this.emsAccess = emsAccess;
+        this.emsEmployees = emsEmployees;
         this.aiChatClient = chatClientBuilder
                 .defaultSystem("You are the helpful TeamConnect workspace assistant. Keep responses clear and concise.")
                 .build();
@@ -116,10 +129,14 @@ public class ApplicationController {
             @RequestParam String username,
             @RequestParam String email,
             @RequestParam String password,
+            @RequestParam(defaultValue = "EMPLOYEE") String role,
             HttpServletRequest request) {
         if (!isAdmin(request)) return "redirect:/admin";
-        users.register(username, email, password);
-        admin.log(String.valueOf(request.getSession(false).getAttribute("adminUsername")), "ACCOUNT_CREATED", null, username, request.getRemoteAddr());
+        int userId = admin.createAccount(username, email, password, role);
+        if (userId > 0 && !"ADMIN".equalsIgnoreCase(role)) {
+            emsEmployees.createLinked(userId, username.trim(), email.trim(), role);
+        }
+        admin.log(String.valueOf(request.getSession(false).getAttribute("adminUsername")), "ACCOUNT_CREATED", userId == 0 ? null : userId, username + "/" + role, request.getRemoteAddr());
         return "redirect:/admin";
     }
 
@@ -152,6 +169,7 @@ public class ApplicationController {
             HttpServletRequest request) {
         if (!isAdmin(request)) return "redirect:/admin";
         admin.setAccountState(id, status, role);
+        emsEmployees.syncAccount(id, role, status);
         admin.log(String.valueOf(request.getSession(false).getAttribute("adminUsername")), "ACCOUNT_ACCESS_CHANGED", id, status + "/" + role, request.getRemoteAddr());
         return "redirect:/admin";
     }
@@ -222,6 +240,7 @@ public class ApplicationController {
     public String login(
             @RequestParam String username,
             @RequestParam String password,
+            @RequestParam(required = false, defaultValue = "employee") String workspace,
             HttpServletRequest request) {
 
         User user = users.authenticate(username, password);
@@ -231,6 +250,10 @@ public class ApplicationController {
 
         if (admin.isAdminUser(user.getId())) {
             return "redirect:/views/register.jsp?error=admin_login_route";
+        }
+        String requestedRole = workspace == null ? "" : workspace.trim().toLowerCase();
+        if (!java.util.Set.of("employee", "hr", "manager").contains(requestedRole)) {
+            return "redirect:/views/register.jsp?error=role_required";
         }
 
         HttpSession previousSession = request.getSession(false);
@@ -243,9 +266,18 @@ public class ApplicationController {
         session.setAttribute("username", user.getUsername());
         session.setAttribute("email", user.getEmail());
         admin.recordLogin(user.getId(), request.getRemoteAddr());
-        // Normal landing-page login always creates a workspace user session.
-        // Administrator authentication is created only by /admin/login.
-        return "redirect:/chat";
+        try {
+            Employee employee = emsAccess.currentEmployee(request);
+            String employeeRole = employee.getRole() == null ? "employee" : employee.getRole().toLowerCase();
+            if (!employeeRole.equals(requestedRole)) {
+                request.getSession(false).invalidate();
+                return "redirect:/views/register.jsp?error=role_mismatch";
+            }
+            return "redirect:/ems/" + employeeRole;
+        } catch (RuntimeException ignored) {
+            request.getSession(false).invalidate();
+            return "redirect:/views/register.jsp?error=ems_link_missing";
+        }
     }
 
     @PostMapping("/register")
@@ -257,7 +289,9 @@ public class ApplicationController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request) {
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        response.setHeader("Pragma", "no-cache");
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();
@@ -493,6 +527,13 @@ public class ApplicationController {
         }
         if (message == null || message.isBlank()) {
             return Map.of("reply", "Please enter a message.");
+        }
+
+        try {
+            var commandReply = emsAiCommands.command(message, request);
+            if (commandReply.isPresent()) return Map.of("reply", commandReply.get());
+        } catch (ResponseStatusException ignored) {
+            // Non-EMS TeamConnect users continue to use the existing assistant.
         }
 
         try {

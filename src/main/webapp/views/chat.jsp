@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
+﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
          import="model.User,model.Message,model.GroupChat,java.util.List,java.util.Map,util.WebUtil" %>
 <%
     jakarta.servlet.http.HttpSession activeSession = request.getSession(false);
@@ -53,7 +53,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>TeamConnect — Workspace</title>
+<title>TeamConnect â€” Workspace</title>
 <script>(function(){try{document.documentElement.dataset.theme=localStorage.getItem("teamconnect-theme")||"blue"}catch(e){}})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -256,7 +256,7 @@ textarea:disabled{cursor:not-allowed;opacity:.6}
 @media(max-width:1200px){.workspace{grid-template-columns:clamp(15rem,30vw,21rem) minmax(0,1fr)}.insights{display:none}.account-email{max-width:8rem}}
 @media(max-width:980px){.account>div:last-child,.brand p{display:none}.theme-select{max-width:9rem}}
 @media(max-width:860px){body{overflow-y:auto}.dashboard{height:auto;min-height:100dvh;overflow:visible}.dashboard-shell{height:auto;min-height:calc(100dvh - 1rem)}.topbar{position:sticky;top:.4rem;z-index:12;flex-wrap:wrap}.workspace{display:flex;flex-direction:column;flex:none}.sidebar{max-height:42dvh}.conversation{height:calc(100dvh - 6rem);min-height:30rem}.thread-badge{display:none}.message-stream{padding:1rem .9rem}.message-row>div:last-child,.message-row>.bubble{max-width:88%}.composer{padding:.6rem .6rem .75rem}}
-@media(max-width:560px){.top-actions{width:100%;justify-content:flex-start;gap:.4rem}.theme-select{flex:1;max-width:none;min-width:8rem}.btn{padding:0 .7rem}.status span:last-child{display:none}.brand-mark{width:2.3rem;height:2.3rem}.brand h1{font-size:1.1rem}.ai-launch{font-size:0;width:2.4rem;padding:0}.ai-launch::before{content:"✦";font-size:1rem}.attachment-chip{max-width:6.5rem}.ai-panel{top:.4rem;right:.4rem;bottom:.4rem;width:calc(100vw - .8rem);max-height:none}}
+@media(max-width:560px){.top-actions{width:100%;justify-content:flex-start;gap:.4rem}.theme-select{flex:1;max-width:none;min-width:8rem}.btn{padding:0 .7rem}.status span:last-child{display:none}.brand-mark{width:2.3rem;height:2.3rem}.brand h1{font-size:1.1rem}.ai-launch{font-size:0;width:2.4rem;padding:0}.ai-launch::before{content:"âœ¦";font-size:1rem}.attachment-chip{max-width:6.5rem}.ai-panel{top:.4rem;right:.4rem;bottom:.4rem;width:calc(100vw - .8rem);max-height:none}}
 @media(max-height:660px) and (min-width:861px){.section-header p{display:none}#groupList{max-height:4.5rem}.metric{padding:.55rem 0}.message-stream{padding-top:.7rem}}
 @media(min-width:1900px){.dashboard-shell{max-width:120rem}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
@@ -307,7 +307,7 @@ textarea:disabled{cursor:not-allowed;opacity:.6}
             </optgroup>
         </select>
 
-        <button class="btn ai-launch" type="button" onclick="toggleAiPanel()">✦ AI Assistant</button>
+        <button class="btn ai-launch" type="button" onclick="toggleAiPanel()">âœ¦ AI Assistant</button>
 
         <div class="status">
             <span class="status-dot"></span>
@@ -323,11 +323,7 @@ textarea:disabled{cursor:not-allowed;opacity:.6}
             </div>
         </div>
 
-        <form id="deleteAccountForm" action="<%= contextPath %>/deleteAccount" method="post">
-            <button class="btn btn-danger" type="submit">Delete</button>
-        </form>
-
-        <a class="btn" href="<%= contextPath %>/logout">Logout</a>
+        <a class="btn" href="<%= Boolean.TRUE.equals(session.getAttribute("adminAuthenticated")) ? contextPath + "/admin" : contextPath + "/ems" %>">Back to dashboard</a>
 
     </div>
 
@@ -337,9 +333,9 @@ textarea:disabled{cursor:not-allowed;opacity:.6}
 <section class="notification-stack" aria-label="Notifications">
     <% for (Map<String, Object> notification : notifications) { String notificationType = String.valueOf(notification.get("type")).toLowerCase(); %>
     <article class="notification-card <%= notificationType %>">
-        <div class="notification-badge"><%= "SUCCESS".equalsIgnoreCase(String.valueOf(notification.get("type"))) ? "✓" : "!" %></div>
-        <div><strong><%= WebUtil.escapeHtml(String.valueOf(notification.get("title"))) %></strong><p><%= WebUtil.escapeHtml(String.valueOf(notification.get("message"))) %></p><small>From <%= WebUtil.escapeHtml(String.valueOf(notification.get("created_by"))) %> · <%= notification.get("created_at") %></small></div>
-        <button class="notification-dismiss" type="button" aria-label="Dismiss notification" onclick="this.closest('.notification-card').remove()">×</button>
+        <div class="notification-badge"><%= "SUCCESS".equalsIgnoreCase(String.valueOf(notification.get("type"))) ? "âœ“" : "!" %></div>
+        <div><strong><%= WebUtil.escapeHtml(String.valueOf(notification.get("title"))) %></strong><p><%= WebUtil.escapeHtml(String.valueOf(notification.get("message"))) %></p><small>From <%= WebUtil.escapeHtml(String.valueOf(notification.get("created_by"))) %> Â· <%= notification.get("created_at") %></small></div>
+        <button class="notification-dismiss" type="button" aria-label="Dismiss notification" onclick="this.closest('.notification-card').remove()">Ã—</button>
     </article>
     <% } %>
 </section>
@@ -519,7 +515,6 @@ textarea:disabled{cursor:not-allowed;opacity:.6}
                         <div class="bubble-actions">
                             <% if (mine) { %>
                             <button type="button" class="message-action" data-action="edit">Edit</button>
-                            <button type="button" class="message-action" data-action="delete">Delete</button>
                             <% } %>
                         </div>
                     </div>
@@ -621,13 +616,13 @@ textarea:disabled{cursor:not-allowed;opacity:.6}
 
                         <span class="attachment-chip" id="attachmentLabel">No attachment</span>
 
-                        <button type="button" class="tool-btn" id="pollButton" title="Create poll" aria-label="Create poll">☰</button>
+                        <button type="button" class="tool-btn" id="pollButton" title="Create poll" aria-label="Create poll">â˜°</button>
 
-                        <button type="button" class="attachment-clear" id="clearAttachmentButton" hidden aria-label="Remove attachment">×</button>
+                        <button type="button" class="attachment-clear" id="clearAttachmentButton" hidden aria-label="Remove attachment">Ã—</button>
 
                     </div>
 
-                    <button class="send-btn" id="sendButton" type="submit">Send&nbsp; ↑</button>
+                    <button class="send-btn" id="sendButton" type="submit">Send&nbsp; â†‘</button>
 
                 </div>
 
@@ -650,7 +645,7 @@ textarea:disabled{cursor:not-allowed;opacity:.6}
         <div class="insights-content">
 
             <div class="workspace-status">
-                <div class="workspace-status-icon">✓</div>
+                <div class="workspace-status-icon">âœ“</div>
                 <div>
                     <strong>Workspace online</strong>
                     <span>Secure session active</span>
@@ -712,7 +707,7 @@ textarea:disabled{cursor:not-allowed;opacity:.6}
 
         <button type="button" class="ai-reset" onclick="resetAiChat()" title="Clear AI conversation">Reset</button>
 
-        <button type="button" class="ai-close" aria-label="Close assistant" onclick="toggleAiPanel()">×</button>
+        <button type="button" class="ai-close" aria-label="Close assistant" onclick="toggleAiPanel()">Ã—</button>
 
     </div>
 
@@ -899,5 +894,28 @@ textarea:disabled{cursor:not-allowed;opacity:.6}
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 <script src="<%= contextPath %>/assets/js/chat.js?v=2" defer></script>
 
-</body>
+<style id="tc-premium-ui">
+:root{--tc-ease:cubic-bezier(.2,.8,.2,1)}
+body{transition:background .6s ease,color .45s ease}
+body:not(.dashboard):before{transition:opacity .6s,transform .6s}
+button,a,input,select,textarea{transition:transform .28s var(--tc-ease),box-shadow .28s,border-color .28s,background .45s,color .3s}
+button:hover,a:hover{transform:translateY(-2px)}
+button:active,a:active{transform:scale(.97)}
+input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb,var(--accent,#4c9bff) 55%,#fff0)}
+input:focus,select:focus,textarea:focus{outline:0;transform:translateY(-2px);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent,#4c9bff) 18%,transparent),0 12px 28px #1d64aa16}
+.card,.panel,.auth-page,.auth-wrapper,.shell,.form-section,.image-section,.sidebar,.conversation,.insights,.workspace-card{transition:transform .4s var(--tc-ease),box-shadow .4s,border-color .4s,background .5s}
+.card:hover,.panel:hover,.workspace-card:hover{transform:translateY(-6px);box-shadow:0 24px 60px color-mix(in srgb,var(--accent,#4c9bff) 15%,transparent)}
+.reveal,.section,.auth-page,.tile,.role{animation:tcEnter .72s var(--tc-ease) both}
+@keyframes tcEnter{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes tcShimmer{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
+@keyframes tcPulse{50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--accent,#4c9bff) 10%,transparent)}}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:linear-gradient(var(--accent,#4c9bff),var(--cyan,#6de0bd));border:3px solid transparent;background-clip:padding-box;border-radius:99px}
+body.theme-changing:after{content:"";position:fixed;inset:0;z-index:999;background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--accent,#4c9bff) 28%,transparent),transparent 55%);pointer-events:none;animation:tcTheme .7s ease both}
+@keyframes tcTheme{from{opacity:0;transform:scale(.8)}45%{opacity:1}to{opacity:0;transform:scale(1.15)}}
+@media(max-width:700px){button:hover,a:hover{transform:none}.card:hover,.panel:hover,.workspace-card:hover{transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;transform:none!important}}
+</style><script id="tc-premium-behavior">
+(function(){function animateTheme(){document.body.classList.remove("theme-changing");void document.body.offsetWidth;document.body.classList.add("theme-changing");setTimeout(function(){document.body.classList.remove("theme-changing")},700)}["theme","themeToggle","themeSelect"].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener("click",animateTheme)});var r=document.querySelectorAll(".card,.panel,.tile,.role,.section,.auth-page");r.forEach(function(e,i){e.style.animationDelay=Math.min(i*.045,.5)+"s"});})();
+</script></body>
 </html>
+
