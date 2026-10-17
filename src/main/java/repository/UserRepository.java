@@ -4,12 +4,17 @@ import dao.UserDAO;
 import model.User;
 import org.springframework.stereotype.Repository;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 @Repository
 public class UserRepository {
 
-    private final UserDAO dao = new UserDAO();
+    private final UserDAO dao;
+
+    public UserRepository(DataSource dataSource) {
+        this.dao = new UserDAO(dataSource);
+    }
 
     public User findById(int id) {
         return dao.findById(id);

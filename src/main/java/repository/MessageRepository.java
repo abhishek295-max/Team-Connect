@@ -5,12 +5,17 @@ import model.Message;
 import org.springframework.stereotype.Repository;
 import util.AttachmentUtil;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 @Repository
 public class MessageRepository {
 
-    private final MessageDAO dao = new MessageDAO();
+    private final MessageDAO dao;
+
+    public MessageRepository(DataSource dataSource) {
+        this.dao = new MessageDAO(dataSource);
+    }
 
     public List<Message> conversation(int userId, int contactId) {
         return dao.getConversation(userId, contactId);

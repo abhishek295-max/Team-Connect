@@ -2,9 +2,9 @@ package dao;
 
 import model.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import util.DBConnection;
 import util.AttachmentUtil;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +16,12 @@ public class UserDAO {
 
     private final BCryptPasswordEncoder passwordEncoder =
             new BCryptPasswordEncoder();
+
+    private final DataSource dataSource;
+
+    public UserDAO(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     public static final class RegistrationResult {
         private final boolean success;
@@ -55,11 +61,7 @@ public class UserDAO {
         String cleanUsername = username.trim();
         String cleanEmail = email.trim();
 
-        try (Connection con = DBConnection.getConnection()) {
-
-            if (con == null) {
-                return RegistrationResult.failure("database_unavailable");
-            }
+        try (Connection con = dataSource.getConnection()) {
 
             if (usernameExists(con, cleanUsername)) {
                 return RegistrationResult.failure("username_taken");
@@ -109,11 +111,7 @@ public class UserDAO {
             return null;
         }
 
-        try (Connection con = DBConnection.getConnection()) {
-
-            if (con == null) {
-                return null;
-            }
+        try (Connection con = dataSource.getConnection()) {
 
             String sql =
                     "SELECT id, username, email, password, status FROM users WHERE username=?";
@@ -162,7 +160,7 @@ public class UserDAO {
     }
 
     public User findById(int userId) {
-        try (Connection con = DBConnection.getConnection()) {
+        try (Connection con = dataSource.getConnection()) {
             if (con == null) {
                 return null;
             }
@@ -190,10 +188,7 @@ public class UserDAO {
     public List<User> findContacts(int currentUserId) {
         List<User> contacts = new ArrayList<>();
 
-        try (Connection con = DBConnection.getConnection()) {
-            if (con == null) {
-                return contacts;
-            }
+        try (Connection con = dataSource.getConnection()) {
 
             ensureAttachmentTable(con);
 
@@ -216,6 +211,7 @@ public class UserDAO {
                     " LIMIT 1) AS last_message_at " +
                     "FROM users u " +
                     "WHERE u.id <> ? " +
+                    "AND COALESCE(u.status, 'ACTIVE') = 'ACTIVE' " +
                     "ORDER BY COALESCE(last_message_at, '1970-01-01 00:00:00') DESC, u.username ASC";
 
             try (PreparedStatement ps =
@@ -240,10 +236,7 @@ public class UserDAO {
     }
 
     public int countUsers() {
-        try (Connection con = DBConnection.getConnection()) {
-            if (con == null) {
-                return 0;
-            }
+        try (Connection con = dataSource.getConnection()) {
 
             String sql = "SELECT COUNT(*) AS total FROM users";
 
@@ -267,10 +260,7 @@ public class UserDAO {
 
         List<String> attachmentFiles = new ArrayList<>();
 
-        try (Connection con = DBConnection.getConnection()) {
-            if (con == null) {
-                return false;
-            }
+        try (Connection con = dataSource.getConnection()) {
 
             ensureAttachmentTable(con);
             con.setAutoCommit(false);
@@ -295,11 +285,24 @@ public class UserDAO {
             }
 
             try (PreparedStatement ps = con.prepareStatement(
+                    "DELETE FROM message_attachments WHERE message_id IN " +
+                            "(SELECT id FROM messages WHERE sender_id=? OR receiver_id=?)")) {
+                ps.setInt(1, userId);
+                ps.setInt(2, userId);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = con.prepareStatement(
                     "DELETE FROM messages WHERE sender_id=? OR receiver_id=?")) {
                 ps.setInt(1, userId);
                 ps.setInt(2, userId);
                 ps.executeUpdate();
             }
+
+            deleteIfTableExists(con, "admin_notifications", "recipient_id=?", userId);
+            deleteIfTableExists(con, "group_messages", "sender_id=?", userId);
+            deleteOwnedGroups(con, userId);
+            deleteIfTableExists(con, "chat_group_members", "user_id=?", userId);
 
             try (PreparedStatement ps = con.prepareStatement(
                     "DELETE FROM users WHERE id=?")) {
@@ -428,5 +431,49 @@ public class UserDAO {
             } catch (Exception ignored) {
             }
         }
+    }
+
+    private void deleteIfTableExists(Connection con,
+                                     String table,
+                                     String condition,
+                                     int value) throws Exception {
+        String sql = "DELETE FROM " + table + " WHERE " + condition;
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, value);
+            ps.executeUpdate();
+        } catch (Exception exception) {
+            if (!isMissingTable(exception)) {
+                throw exception;
+            }
+        }
+    }
+
+    private void deleteOwnedGroups(Connection con, int userId) throws Exception {
+        List<Integer> groupIds = new ArrayList<>();
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT id FROM chat_groups WHERE owner_id=?")) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    groupIds.add(rs.getInt("id"));
+                }
+            }
+        } catch (Exception exception) {
+            if (!isMissingTable(exception)) {
+                throw exception;
+            }
+            return;
+        }
+
+        for (Integer groupId : groupIds) {
+            deleteIfTableExists(con, "group_messages", "group_id=?", groupId);
+            deleteIfTableExists(con, "chat_group_members", "group_id=?", groupId);
+            deleteIfTableExists(con, "chat_groups", "id=?", groupId);
+        }
+    }
+
+    private boolean isMissingTable(Exception exception) {
+        String message = exception.getMessage();
+        return message != null && message.toLowerCase().contains("doesn't exist");
     }
 }

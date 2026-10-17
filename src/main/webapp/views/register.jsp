@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
 if (session != null && Boolean.TRUE.equals(session.getAttribute("adminAuthenticated"))) { response.sendRedirect(request.getContextPath() + "/admin"); return; }
 if (session != null && session.getAttribute("userId") != null) { response.sendRedirect(request.getContextPath() + "/chat"); return; }
@@ -10,6 +10,9 @@ else if ("invalid".equals(error)||"1".equals(error)) {message="Invalid username 
 else if ("username_exists".equals(error)) {message="That username is already in use.";messageIsError=true;}
 else if ("email_exists".equals(error)) {message="That email address is already registered.";messageIsError=true;}
 else if ("admin_login_route".equals(error)) {message="Administrator accounts must sign in from the separate /admin panel.";messageIsError=true;}
+else if ("role_mismatch".equals(error)) {message="This account is not assigned to the selected workforce role.";messageIsError=true;}
+else if ("role_required".equals(error)) {message="Select Employee, HR, or Manager before signing in.";messageIsError=true;}
+else if ("ems_link_missing".equals(error)) {message="Your TeamConnect account is not linked to an employee profile yet.";messageIsError=true;}
 else if (error!=null) {message="The request could not be completed. Please try again.";messageIsError=true;}
 %>
 <!DOCTYPE html>
@@ -412,6 +415,7 @@ else if (error!=null) {message="The request could not be completed. Please try a
 
 
        .auth-page.register-page{display:none!important}.auth-page:first-child .switch-text{display:none!important}
+    .auth-container{animation:authIn .8s cubic-bezier(.2,.8,.2,1) both}.image-section img{animation:heroZoom 12s ease-in-out infinite alternate}.form-content>*{animation:fieldIn .55s both}.form-content>*:nth-child(2){animation-delay:.08s}.form-content>*:nth-child(3){animation-delay:.14s}.input-group input,.input-group select,.input-group textarea{transition:border-color .2s,box-shadow .2s,transform .2s,background-color .25s}.input-group input:hover,.input-group select:hover{transform:translateY(-1px);border-color:#9db8d3}.input-group input:focus,.input-group select:focus{transform:translateY(-2px);box-shadow:0 0 0 4px #316fe01a,0 10px 24px #223b5914}.submit-btn{transition:transform .2s,box-shadow .25s,background-color .25s}.submit-btn:hover{transform:translateY(-3px);box-shadow:0 14px 28px #1118272b}.submit-btn:active{transform:translateY(-1px) scale(.98)}.switch-text button,.forgot{transition:color .2s,transform .2s}.switch-text button:hover,.forgot:hover{transform:translateX(2px)}@keyframes authIn{from{opacity:0;transform:translateY(20px) scale(.98)}to{opacity:1;transform:none}}@keyframes heroZoom{from{transform:scale(1)}to{transform:scale(1.06)}}@keyframes fieldIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
     </style>
 
 
@@ -474,6 +478,16 @@ else if (error!=null) {message="The request could not be completed. Please try a
 
 
                     <form method="post" action="/login">
+
+                        <div class="input-group">
+                            <label for="workspace">Sign in to</label>
+                            <select id="workspace" name="workspace" style="width:100%;padding:13px 14px;border:1px solid #d8e1ed;border-radius:12px;background:#fff;color:#1f3045;font:inherit">
+                                <option value="employee">Employee Dashboard</option>
+                                <option value="hr">HR Dashboard</option>
+                                <option value="manager">Manager Dashboard</option>
+                            </select>
+                            <small style="display:block;margin-top:6px;color:#708198">Administrators use the separate secure <a href="/admin">Admin Console</a>.</small>
+                        </div>
 
                         <div class="input-group">
 
@@ -669,5 +683,34 @@ else if (error!=null) {message="The request could not be completed. Please try a
 
 
 
-</body>
+<style id="tc-premium-ui">
+:root{--tc-ease:cubic-bezier(.2,.8,.2,1)}
+body{transition:background .6s ease,color .45s ease}
+body:not(.dashboard):before{transition:opacity .6s,transform .6s}
+button,a,input,select,textarea{transition:transform .28s var(--tc-ease),box-shadow .28s,border-color .28s,background .45s,color .3s}
+button:hover,a:hover{transform:translateY(-2px)}
+button:active,a:active{transform:scale(.97)}
+input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb,var(--accent,#4c9bff) 55%,#fff0)}
+input:focus,select:focus,textarea:focus{outline:0;transform:translateY(-2px);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent,#4c9bff) 18%,transparent),0 12px 28px #1d64aa16}
+.card,.panel,.auth-page,.auth-wrapper,.shell,.form-section,.image-section,.sidebar,.conversation,.insights,.workspace-card{transition:transform .4s var(--tc-ease),box-shadow .4s,border-color .4s,background .5s}
+.card:hover,.panel:hover,.workspace-card:hover{transform:translateY(-6px);box-shadow:0 24px 60px color-mix(in srgb,var(--accent,#4c9bff) 15%,transparent)}
+.reveal,.section,.auth-page,.tile,.role{animation:tcEnter .72s var(--tc-ease) both}
+@keyframes tcEnter{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes tcShimmer{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
+@keyframes tcPulse{50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--accent,#4c9bff) 10%,transparent)}}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:linear-gradient(var(--accent,#4c9bff),var(--cyan,#6de0bd));border:3px solid transparent;background-clip:padding-box;border-radius:99px}
+body.theme-changing:after{content:"";position:fixed;inset:0;z-index:999;background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--accent,#4c9bff) 28%,transparent),transparent 55%);pointer-events:none;animation:tcTheme .7s ease both}
+@keyframes tcTheme{from{opacity:0;transform:scale(.8)}45%{opacity:1}to{opacity:0;transform:scale(1.15)}}
+@media(max-width:700px){button:hover,a:hover{transform:none}.card:hover,.panel:hover,.workspace-card:hover{transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;transform:none!important}}
+</style><script id="tc-premium-behavior">
+(function(){function animateTheme(){document.body.classList.remove("theme-changing");void document.body.offsetWidth;document.body.classList.add("theme-changing");setTimeout(function(){document.body.classList.remove("theme-changing")},700)}["theme","themeToggle","themeSelect"].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener("click",animateTheme)});var r=document.querySelectorAll(".card,.panel,.tile,.role,.section,.auth-page");r.forEach(function(e,i){e.style.animationDelay=Math.min(i*.045,.5)+"s"});})();
+</script><style>
+#registerTheme{position:fixed;right:24px;top:22px;z-index:50;width:42px;height:42px;border:1px solid #dce6f1;border-radius:12px;background:#ffffffdd;color:#18263b;cursor:pointer;box-shadow:0 10px 26px #1b47701c}
+html[data-theme=dark] body{background:#070d1a!important;color:#edf4ff!important}html[data-theme=dark] .auth-container{background:radial-gradient(circle at 15% 10%,#1b396655,transparent 35rem),#070d1a!important}html[data-theme=dark] .auth-wrapper,html[data-theme=dark] .form-section,html[data-theme=dark] .auth-page{background:#0d1930!important;color:#edf4ff!important;border-color:#263c5d!important}html[data-theme=dark] .subtitle,html[data-theme=dark] .switch-text,html[data-theme=dark] label{color:#a7b8d0!important}html[data-theme=dark] input,html[data-theme=dark] select{background:#101f39!important;color:#edf4ff!important;border-color:#2a4165!important}html[data-theme=dark] .input-group input::placeholder{color:#8193b0!important}
+</style>
+<button id="registerTheme" type="button" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+<script>(function(){var b=document.getElementById("registerTheme"),r=document.documentElement,t=localStorage.getItem("tcRegisterTheme")||"light";r.dataset.theme=t;function sync(){var d=r.dataset.theme==="dark";b.innerHTML=d?"<i class=\\"fa-solid fa-sun\\"></i>":"<i class=\\"fa-solid fa-moon\\"></i>"}sync();b.onclick=function(){r.dataset.theme=r.dataset.theme==="dark"?"light":"dark";localStorage.setItem("tcRegisterTheme",r.dataset.theme);document.body.classList.add("theme-changing");sync();setTimeout(function(){document.body.classList.remove("theme-changing")},700)}})();</script></body>
 </html>
+
+
