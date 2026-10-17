@@ -121,6 +121,24 @@ public class AdminService {
         return jdbc.update("UPDATE users SET status = ?, role = ? WHERE id = ?", status, role, id) > 0;
     }
 
+    public int createAccount(String username, String email, String password, String role) {
+        if (username == null || username.isBlank() || email == null || email.isBlank()
+                || password == null || password.length() < 6) return 0;
+        String safeRole = role == null ? "EMPLOYEE" : role.trim().toUpperCase();
+        if (!List.of("EMPLOYEE", "HR", "MANAGER", "ADMIN").contains(safeRole)) safeRole = "EMPLOYEE";
+        try {
+            jdbc.update("INSERT INTO users(username,email,password,role,status) VALUES(?,?,?,?,?)",
+                    username.trim(), email.trim(), encoder.encode(password), safeRole, "ACTIVE");
+            Integer id = jdbc.queryForObject("SELECT id FROM users WHERE username = ?", Integer.class, username.trim());
+            if ("ADMIN".equals(safeRole)) {
+                jdbc.update("INSERT INTO admin_accounts(username,password) VALUES(?,?)", username.trim(), encoder.encode(password));
+            }
+            return id == null ? 0 : id;
+        } catch (DataAccessException ignored) {
+            return 0;
+        }
+    }
+
     public List<Map<String, Object>> activityLogs() {
         return jdbc.queryForList("SELECT admin_username, action, target_id, details, ip_address, created_at " +
                 "FROM admin_activity_logs ORDER BY id DESC LIMIT 100");

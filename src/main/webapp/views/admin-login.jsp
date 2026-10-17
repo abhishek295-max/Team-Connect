@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" %>
 <% String contextPath = request.getContextPath(); %>
 <!doctype html>
 <html lang="en">
@@ -158,5 +158,28 @@ body::after{width:500px;height:500px;bottom:-220px;left:-120px;background:radial
     }
 })();
 </script>
-</body>
+<style id="tc-premium-ui">
+:root{--tc-ease:cubic-bezier(.2,.8,.2,1)}
+body{transition:background .6s ease,color .45s ease}
+body:not(.dashboard):before{transition:opacity .6s,transform .6s}
+button,a,input,select,textarea{transition:transform .28s var(--tc-ease),box-shadow .28s,border-color .28s,background .45s,color .3s}
+button:hover,a:hover{transform:translateY(-2px)}
+button:active,a:active{transform:scale(.97)}
+input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb,var(--accent,#4c9bff) 55%,#fff0)}
+input:focus,select:focus,textarea:focus{outline:0;transform:translateY(-2px);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent,#4c9bff) 18%,transparent),0 12px 28px #1d64aa16}
+.card,.panel,.auth-page,.auth-wrapper,.shell,.form-section,.image-section,.sidebar,.conversation,.insights,.workspace-card{transition:transform .4s var(--tc-ease),box-shadow .4s,border-color .4s,background .5s}
+.card:hover,.panel:hover,.workspace-card:hover{transform:translateY(-6px);box-shadow:0 24px 60px color-mix(in srgb,var(--accent,#4c9bff) 15%,transparent)}
+.reveal,.section,.auth-page,.tile,.role{animation:tcEnter .72s var(--tc-ease) both}
+@keyframes tcEnter{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes tcShimmer{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
+@keyframes tcPulse{50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--accent,#4c9bff) 10%,transparent)}}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:linear-gradient(var(--accent,#4c9bff),var(--cyan,#6de0bd));border:3px solid transparent;background-clip:padding-box;border-radius:99px}
+body.theme-changing:after{content:"";position:fixed;inset:0;z-index:999;background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--accent,#4c9bff) 28%,transparent),transparent 55%);pointer-events:none;animation:tcTheme .7s ease both}
+@keyframes tcTheme{from{opacity:0;transform:scale(.8)}45%{opacity:1}to{opacity:0;transform:scale(1.15)}}
+@media(max-width:700px){button:hover,a:hover{transform:none}.card:hover,.panel:hover,.workspace-card:hover{transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;transform:none!important}}
+</style><script id="tc-premium-behavior">
+(function(){function animateTheme(){document.body.classList.remove("theme-changing");void document.body.offsetWidth;document.body.classList.add("theme-changing");setTimeout(function(){document.body.classList.remove("theme-changing")},700)}["theme","themeToggle","themeSelect"].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener("click",animateTheme)});var r=document.querySelectorAll(".card,.panel,.tile,.role,.section,.auth-page");r.forEach(function(e,i){e.style.animationDelay=Math.min(i*.045,.5)+"s"});})();
+</script></body>
 </html>
+

@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" import="java.util.List,java.util.Map,util.WebUtil" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" import="java.util.List,java.util.Map,util.WebUtil" %>
 <% String contextPath = request.getContextPath(); List<Map<String,Object>> accounts = (List<Map<String,Object>>) request.getAttribute("accounts"); if (accounts == null) accounts = java.util.Collections.emptyList(); Map<String,Object> stats = (Map<String,Object>) request.getAttribute("stats"); if (stats == null) stats = java.util.Collections.emptyMap(); List<Map<String,Object>> recentAccounts = (List<Map<String,Object>>) request.getAttribute("recentAccounts"); if (recentAccounts == null) recentAccounts = java.util.Collections.emptyList(); List<Map<String,Object>> activityLogs = (List<Map<String,Object>>) request.getAttribute("activityLogs"); if (activityLogs == null) activityLogs = java.util.Collections.emptyList(); List<Map<String,Object>> messageTrend = (List<Map<String,Object>>) request.getAttribute("messageTrend"); if (messageTrend == null) messageTrend = java.util.Collections.emptyList(); int trendMax = 1; for (Map<String,Object> point : messageTrend) { trendMax = Math.max(trendMax, ((Number) point.get("total")).intValue()); } int usersTotal = ((Number) stats.getOrDefault("users", 0)).intValue(); int messagesTotal = ((Number) stats.getOrDefault("messages", 0)).intValue(); int groupsTotal = ((Number) stats.getOrDefault("groups", 0)).intValue(); int attachmentsTotal = ((Number) stats.getOrDefault("attachments", 0)).intValue(); int activityTotal = Math.max(1, usersTotal + messagesTotal + groupsTotal + attachmentsTotal); int userPct = usersTotal * 100 / activityTotal; int messagePct = messagesTotal * 100 / activityTotal; int groupPct = groupsTotal * 100 / activityTotal; int filePct = Math.max(0, 100 - userPct - messagePct - groupPct); %>
 <!doctype html>
 <html lang="en">
@@ -211,6 +211,7 @@ textarea{resize:vertical}
         <div><h1>Account administration</h1><small id="clock"></small></div>
         <div class="tools">
             <a class="btn sm" href="<%= contextPath %>/chat"><svg class="i"><use href="#i-chat"/></svg>Open workspace chat</a>
+            <a class="btn sm" href="<%= contextPath %>/ems/admin">Employee operations</a>
             <a class="btn sm" href="<%= contextPath %>/admin/export/accounts.csv"><svg class="i"><use href="#i-dl"/></svg>Export accounts CSV</a>
             <a class="btn sm" href="<%= contextPath %>/admin/export/activity.csv"><svg class="i"><use href="#i-dl"/></svg>Export activity CSV</a>
             <button class="btn tg" id="themeToggle" type="button" aria-label="Toggle light and dark mode"><svg class="i moon"><use href="#i-moon"/></svg><svg class="i sun"><use href="#i-sun"/></svg></button>
@@ -287,6 +288,8 @@ textarea{resize:vertical}
                 <label class="field">Username<input name="username" required maxlength="80"></label>
                 <label class="field">Email<input type="email" name="email" required maxlength="160"></label>
                 <label class="field">Password<input type="password" name="password" required minlength="6"></label>
+                <label class="field">Workforce role<select name="role" required><option value="EMPLOYEE">Employee</option><option value="HR">HR</option><option value="MANAGER">Manager</option><option value="ADMIN">Admin</option></select></label>
+                <p class="sub">Employee, HR and Manager accounts are automatically linked to the EMS dashboard. Admin accounts use the separate Admin Console login.</p>
                 <button class="btn pri" type="submit" style="width:100%">Create account</button>
             </form>
         </section>
@@ -304,8 +307,8 @@ textarea{resize:vertical}
     </main>
 
     <section class="sec" id="security">
-        <section class="card rv"><h2>Roles and access</h2><p class="sub">Control account permissions and availability.</p><div class="sl"><% for (Map<String,Object> account : accounts) { %><div class="sr"><div><strong><%= WebUtil.escapeHtml(String.valueOf(account.get("username"))) %></strong><small>ID <%= account.get("id") %> · <%= account.get("last_login_at") == null ? "Never signed in" : "Last active " + account.get("last_login_at") %></small></div><form method="post" action="<%= contextPath %>/admin/accounts/state"><input type="hidden" name="id" value="<%= account.get("id") %>"><select name="role"><option value="USER" <%= "USER".equals(account.get("role")) ? "selected" : "" %>>User</option><option value="MODERATOR" <%= "MODERATOR".equals(account.get("role")) ? "selected" : "" %>>Moderator</option><option value="ADMIN" <%= "ADMIN".equals(account.get("role")) ? "selected" : "" %>>Admin</option></select><select name="status"><option value="ACTIVE" <%= "ACTIVE".equals(account.get("status")) ? "selected" : "" %>>Active</option><option value="SUSPENDED" <%= "SUSPENDED".equals(account.get("status")) ? "selected" : "" %>>Suspended</option><option value="DISABLED" <%= "DISABLED".equals(account.get("status")) ? "selected" : "" %>>Disabled</option></select><button class="btn sm" type="submit">Apply</button></form></div><% } %></div></section>
-        <section class="card rv"><h2>Admin activity</h2><p class="sub">Recent security and account administration events.</p><div class="lgs"><% for (Map<String,Object> log : activityLogs) { %><div class="lr"><strong><%= WebUtil.escapeHtml(String.valueOf(log.get("action"))) %></strong><span><%= WebUtil.escapeHtml(String.valueOf(log.get("admin_username"))) %> · target <%= log.get("target_id") == null ? "system" : log.get("target_id") %> · <%= log.get("created_at") %></span></div><% } %><% if (activityLogs.isEmpty()) { %><div class="empty">No activity recorded yet.</div><% } %></div></section>
+        <section class="card rv"><h2>Roles and access</h2><p class="sub">Control account permissions and availability.</p><div class="sl"><% for (Map<String,Object> account : accounts) { %><div class="sr"><div><strong><%= WebUtil.escapeHtml(String.valueOf(account.get("username"))) %></strong><small>ID <%= account.get("id") %> Â· <%= account.get("last_login_at") == null ? "Never signed in" : "Last active " + account.get("last_login_at") %></small></div><form method="post" action="<%= contextPath %>/admin/accounts/state"><input type="hidden" name="id" value="<%= account.get("id") %>"><select name="role"><option value="USER" <%= "USER".equals(account.get("role")) ? "selected" : "" %>>User</option><option value="MODERATOR" <%= "MODERATOR".equals(account.get("role")) ? "selected" : "" %>>Moderator</option><option value="ADMIN" <%= "ADMIN".equals(account.get("role")) ? "selected" : "" %>>Admin</option></select><select name="status"><option value="ACTIVE" <%= "ACTIVE".equals(account.get("status")) ? "selected" : "" %>>Active</option><option value="SUSPENDED" <%= "SUSPENDED".equals(account.get("status")) ? "selected" : "" %>>Suspended</option><option value="DISABLED" <%= "DISABLED".equals(account.get("status")) ? "selected" : "" %>>Disabled</option></select><button class="btn sm" type="submit">Apply</button></form></div><% } %></div></section>
+        <section class="card rv"><h2>Admin activity</h2><p class="sub">Recent security and account administration events.</p><div class="lgs"><% for (Map<String,Object> log : activityLogs) { %><div class="lr"><strong><%= WebUtil.escapeHtml(String.valueOf(log.get("action"))) %></strong><span><%= WebUtil.escapeHtml(String.valueOf(log.get("admin_username"))) %> Â· target <%= log.get("target_id") == null ? "system" : log.get("target_id") %> Â· <%= log.get("created_at") %></span></div><% } %><% if (activityLogs.isEmpty()) { %><div class="empty">No activity recorded yet.</div><% } %></div></section>
     </section>
 
     <section class="card about rv" id="about">
@@ -393,5 +396,28 @@ function toggleRecipients(enabled) {
     document.getElementById('recipientList').classList.toggle('enabled', enabled);
 }
 </script>
-</body>
+<style id="tc-premium-ui">
+:root{--tc-ease:cubic-bezier(.2,.8,.2,1)}
+body{transition:background .6s ease,color .45s ease}
+body:not(.dashboard):before{transition:opacity .6s,transform .6s}
+button,a,input,select,textarea{transition:transform .28s var(--tc-ease),box-shadow .28s,border-color .28s,background .45s,color .3s}
+button:hover,a:hover{transform:translateY(-2px)}
+button:active,a:active{transform:scale(.97)}
+input:hover,select:hover,textarea:hover{border-color:color-mix(in srgb,var(--accent,#4c9bff) 55%,#fff0)}
+input:focus,select:focus,textarea:focus{outline:0;transform:translateY(-2px);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent,#4c9bff) 18%,transparent),0 12px 28px #1d64aa16}
+.card,.panel,.auth-page,.auth-wrapper,.shell,.form-section,.image-section,.sidebar,.conversation,.insights,.workspace-card{transition:transform .4s var(--tc-ease),box-shadow .4s,border-color .4s,background .5s}
+.card:hover,.panel:hover,.workspace-card:hover{transform:translateY(-6px);box-shadow:0 24px 60px color-mix(in srgb,var(--accent,#4c9bff) 15%,transparent)}
+.reveal,.section,.auth-page,.tile,.role{animation:tcEnter .72s var(--tc-ease) both}
+@keyframes tcEnter{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes tcShimmer{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
+@keyframes tcPulse{50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--accent,#4c9bff) 10%,transparent)}}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:linear-gradient(var(--accent,#4c9bff),var(--cyan,#6de0bd));border:3px solid transparent;background-clip:padding-box;border-radius:99px}
+body.theme-changing:after{content:"";position:fixed;inset:0;z-index:999;background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--accent,#4c9bff) 28%,transparent),transparent 55%);pointer-events:none;animation:tcTheme .7s ease both}
+@keyframes tcTheme{from{opacity:0;transform:scale(.8)}45%{opacity:1}to{opacity:0;transform:scale(1.15)}}
+@media(max-width:700px){button:hover,a:hover{transform:none}.card:hover,.panel:hover,.workspace-card:hover{transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;transform:none!important}}
+</style><script id="tc-premium-behavior">
+(function(){function animateTheme(){document.body.classList.remove("theme-changing");void document.body.offsetWidth;document.body.classList.add("theme-changing");setTimeout(function(){document.body.classList.remove("theme-changing")},700)}["theme","themeToggle","themeSelect"].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener("click",animateTheme)});var r=document.querySelectorAll(".card,.panel,.tile,.role,.section,.auth-page");r.forEach(function(e,i){e.style.animationDelay=Math.min(i*.045,.5)+"s"});})();
+</script></body>
 </html>
+
