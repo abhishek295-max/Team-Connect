@@ -1,21 +1,54 @@
 package model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import util.AttachmentUtil;
 
 import java.sql.Timestamp;
 
+@Entity
+@Table(name = "messages")
 public class Message {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @Column(name = "sender_id", nullable = false)
     private int senderId;
+
+    @Column(name = "receiver_id", nullable = false)
     private int receiverId;
+
+    @Lob
+    @Column(nullable = false)
     private String message;
+
+    @Column(name = "sent_at", insertable = false, updatable = false)
     private Timestamp sentAt;
+
+    @Transient
     private String attachmentName;
+
+    @Transient
     private String attachmentStoredName;
+
+    @Transient
     private String attachmentType;
+
+    @Transient
     private String attachmentKind;
+
+    @Transient
     private long attachmentSize;
+
+    @Transient
     private byte[] attachmentData;
 
     public int getId() {
