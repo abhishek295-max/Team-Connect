@@ -2,8 +2,8 @@ package dao;
 
 import model.Message;
 import util.AttachmentUtil;
-import util.DBConnection;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MessageDAO {
+
+    private final DataSource dataSource;
+
+    public MessageDAO(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     public boolean sendMessage(
             int sender,
@@ -34,11 +40,7 @@ public class MessageDAO {
             return false;
         }
 
-        try (Connection con = DBConnection.getConnection()) {
-
-            if (con == null) {
-                return false;
-            }
+        try (Connection con = dataSource.getConnection()) {
 
             ensureAttachmentTable(con);
             con.setAutoCommit(false);
@@ -94,11 +96,7 @@ public class MessageDAO {
 
         List<Message> messages = new ArrayList<>();
 
-        try (Connection con = DBConnection.getConnection()) {
-
-            if (con == null) {
-                return messages;
-            }
+        try (Connection con = dataSource.getConnection()) {
 
             ensureAttachmentTable(con);
 
@@ -154,10 +152,7 @@ public class MessageDAO {
             return false;
         }
 
-        try (Connection con = DBConnection.getConnection()) {
-            if (con == null) {
-                return false;
-            }
+        try (Connection con = dataSource.getConnection()) {
 
             ensureAttachmentTable(con);
 
@@ -181,10 +176,7 @@ public class MessageDAO {
             int messageId,
             int senderId) {
 
-        try (Connection con = DBConnection.getConnection()) {
-            if (con == null) {
-                return false;
-            }
+        try (Connection con = dataSource.getConnection()) {
 
             ensureAttachmentTable(con);
 
@@ -215,10 +207,7 @@ public class MessageDAO {
     }
 
     public Message findById(int messageId) {
-        try (Connection con = DBConnection.getConnection()) {
-            if (con == null) {
-                return null;
-            }
+        try (Connection con = dataSource.getConnection()) {
 
             ensureAttachmentTable(con);
 
@@ -245,10 +234,7 @@ public class MessageDAO {
     }
 
     public boolean isParticipant(int messageId, int userId) {
-        try (Connection con = DBConnection.getConnection()) {
-            if (con == null) {
-                return false;
-            }
+        try (Connection con = dataSource.getConnection()) {
 
             String sql =
                     "SELECT id FROM messages WHERE id=? AND (sender_id=? OR receiver_id=?)";
