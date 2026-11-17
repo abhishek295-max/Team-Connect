@@ -170,7 +170,7 @@ textarea{resize:vertical}
 @media(max-width:520px){.stats,.hl,.am{grid-template-columns:1fr}.ah input{width:100%}.dev{flex-direction:column;align-items:flex-start}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
 </style>
-</head>
+<link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/premium.css"></head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
 <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>

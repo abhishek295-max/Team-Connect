@@ -1,0 +1,15 @@
+<%@ page contentType="text/html;charset=UTF-8" %><%
+String ctx=request.getContextPath();
+%>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My profile · TeamConnect</title>
+<style>body{margin:0;background:#f3f6fb;color:#14243a;font:14px/1.5 system-ui,sans-serif}.top{padding:16px 5vw;background:white;border-bottom:1px solid #dce4ef;display:flex;justify-content:space-between}.top a{color:#2768d8}.card{max-width:680px;margin:40px auto;background:#fff;border:1px solid #dce4ef;border-radius:14px;padding:24px}h1{font-size:23px;margin:0 0 5px}p{color:#697b91}.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form label{display:grid;gap:5px;font-weight:600;font-size:12px}.form input{border:1px solid #dce4ef;border-radius:8px;padding:10px;font:inherit}.form input[readonly]{background:#f5f7fa;color:#697b91}.actions{grid-column:1/-1;display:flex;gap:10px;margin-top:8px}.btn{border:0;border-radius:8px;padding:10px 15px;background:#2768d8;color:white;font:inherit;cursor:pointer}.msg{min-height:20px;color:#2768d8}@media(max-width:600px){.card{margin:18px 12px}.form{grid-template-columns:1fr}}</style><link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/premium.css"></head>
+<body><header class="top"><strong>TeamConnect · My profile</strong><a href="<%=ctx%>/ems">Back to workforce home</a></header>
+<main class="card"><h1>My employee profile</h1><p>Update contact and role information for your workforce profile.</p><form class="form" id="profileForm"><label>Name<input name="name" readonly></label><label>Email<input name="email" readonly></label><label>Department<input name="department" readonly></label><label>Phone<input name="phone" maxlength="40"></label><label>Gender<input name="gender" maxlength="40"></label><label>Job title<input name="jobTitle" maxlength="160"></label><label>Address<input name="address" maxlength="500"></label><div class="actions"><button class="btn">Save profile</button><span class="msg" id="message" aria-live="polite"></span></div></form></main>
+<script>
+const ctx='<%=ctx%>',form=document.getElementById('profileForm'),message=document.getElementById('message');
+async function request(path,options){const response=await fetch(ctx+path,options);if(!response.ok){let text='Unable to update your profile.';try{text=(await response.json()).error||text}catch{}throw Error(text)}return response.json()}
+async function load(){try{const e=await request('/api/ems/employees/me');for(const k of ['name','email','phone','gender','jobTitle','address'])form.elements[k].value=e[k]||'';form.elements.department.value=e.department?.name||'No department'}catch(e){message.textContent=e.message}}
+form.onsubmit=async event=>{event.preventDefault();const d=Object.fromEntries(new FormData(form));delete d.name;delete d.email;delete d.department;try{await request('/api/ems/employees/me/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});message.textContent='Profile saved.'}catch(e){message.textContent=e.message}};
+load();
+</script></body></html>

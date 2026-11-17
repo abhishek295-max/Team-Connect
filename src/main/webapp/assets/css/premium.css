@@ -1,0 +1,319 @@
+:root {
+    --tc-midnight: #080e1b;
+    --tc-charcoal: #111827;
+    --tc-violet: #7c3aed;
+    --tc-cyan: #06b6d4;
+    --tc-emerald: #10b981;
+    --tc-white: #f8fafc;
+    --tc-metal: #94a3b8;
+    --tc-ease: cubic-bezier(.22, .8, .24, 1);
+}
+
+html {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+:is(a, button, input, select, textarea):focus-visible {
+    outline: 2px solid var(--tc-cyan);
+    outline-offset: 3px;
+}
+
+/* Cinematic welcome surface */
+.loader ~ #page .product::before {
+    inset: 0 -12px -8px;
+    background:
+        linear-gradient(135deg, rgba(8, 14, 27, .3), rgba(8, 14, 27, .12)),
+        url("https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80") center / cover;
+    filter: saturate(.8);
+    border-radius: 30px;
+    opacity: .78;
+}
+
+.loader ~ #page .app#appPreview {
+    border-color: rgba(209, 224, 255, .24);
+    box-shadow: 0 34px 90px rgba(0, 0, 0, .48), inset 0 1px rgba(255, 255, 255, .16);
+}
+
+.loader ~ #page .section {
+    scroll-margin-top: 24px;
+}
+
+/* Authentication and account access */
+.shell {
+    border-color: color-mix(in srgb, var(--tc-metal) 24%, transparent);
+    box-shadow: 0 32px 90px rgba(4, 12, 28, .24);
+}
+
+.shell .visual,
+.shell .vis,
+.image-section {
+    isolation: isolate;
+}
+
+.shell .visual::after,
+.shell .vis::after,
+.image-section::after {
+    pointer-events: none;
+}
+
+.shell input:focus,
+.shell select:focus,
+.auth-container input:focus,
+.auth-container select:focus {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--tc-cyan) 20%, transparent);
+}
+
+.auth-container {
+    background:
+        radial-gradient(ellipse at 18% 0, rgba(6, 182, 212, .12), transparent 34rem),
+        radial-gradient(ellipse at 100% 100%, rgba(124, 58, 237, .12), transparent 38rem),
+        #080e1b;
+}
+
+.auth-container .auth-wrapper,
+.auth-container .form-section {
+    border-color: rgba(148, 163, 184, .22);
+    box-shadow: 0 30px 84px rgba(0, 0, 0, .32);
+}
+
+.auth-container .image-section {
+    overflow: hidden;
+}
+
+.auth-container .image-section img {
+    filter: saturate(.84) contrast(1.04);
+}
+
+.auth-container .form-section {
+    border-radius: 0 22px 22px 0;
+}
+
+.auth-container :is(input, select, textarea) {
+    border-radius: 12px;
+}
+
+.auth-container .submit-btn,
+.login .submit,
+.form .btn.primary {
+    transition: transform .24s var(--tc-ease), box-shadow .24s var(--tc-ease), filter .24s;
+}
+
+.auth-container .submit-btn:hover,
+.login .submit:hover,
+.form .btn.primary:hover {
+    filter: saturate(1.08);
+    box-shadow: 0 15px 34px rgba(6, 182, 212, .2);
+}
+
+/* Chat workspace */
+.dashboard {
+    background:
+        radial-gradient(ellipse at 14% 0, rgba(124, 58, 237, .09), transparent 34rem),
+        radial-gradient(ellipse at 90% 100%, rgba(6, 182, 212, .08), transparent 38rem),
+        var(--bg);
+}
+
+.dashboard .topbar,
+.dashboard .sidebar,
+.dashboard .conversation,
+.dashboard .insights {
+    border-color: color-mix(in srgb, var(--mu) 22%, transparent);
+    box-shadow: 0 18px 48px rgba(8, 14, 27, .1);
+}
+
+.dashboard .topbar {
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+.dashboard .brand-mark {
+    box-shadow: 0 10px 24px rgba(124, 58, 237, .24);
+}
+
+.dashboard .contact-item:is(:hover, .active) {
+    border-color: color-mix(in srgb, var(--ac2) 32%, transparent);
+}
+
+.dashboard .bubble {
+    box-shadow: 0 9px 24px rgba(8, 14, 27, .08);
+}
+
+.dashboard :is(.composer-box, .history-input, .ai-form textarea) {
+    transition: border-color .2s, box-shadow .2s, background-color .2s;
+}
+
+.dashboard :is(.composer-box, .history-input, .ai-form textarea):focus-within {
+    border-color: color-mix(in srgb, var(--ac2) 62%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ac2) 13%, transparent);
+}
+
+/* Administrator command center */
+body > .app .side {
+    background:
+        radial-gradient(ellipse at 0 0, rgba(124, 58, 237, .17), transparent 24rem),
+        linear-gradient(180deg, #0b1425, #080e1b);
+    border-color: rgba(148, 163, 184, .16);
+}
+
+body > .app .nav a:is(:hover, .on) {
+    border-color: rgba(6, 182, 212, .16);
+}
+
+body > .app .hero {
+    box-shadow: 0 26px 70px rgba(10, 48, 101, .34), inset 0 1px rgba(255, 255, 255, .14);
+}
+
+body > .app .card {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+body > .app .card:hover {
+    transform: translateY(-3px);
+}
+
+/* Workforce dashboards */
+.layout > .side {
+    border-color: rgba(148, 163, 184, .18);
+}
+
+.layout > .side {
+    background:
+        radial-gradient(ellipse at 0 0, rgba(124, 58, 237, .16), transparent 26rem),
+        linear-gradient(180deg, #0b1425, #080e1b);
+}
+
+.layout > .side .logo {
+    color: #fff;
+    background: linear-gradient(130deg, var(--tc-violet), var(--tc-cyan));
+}
+
+body > header.top + main:not(.card) .btn.primary {
+    color: #fff;
+    background: linear-gradient(130deg, var(--tc-violet), var(--tc-cyan));
+}
+
+.layout > .side .nav a:is(:hover, .active) {
+    background: linear-gradient(100deg, rgba(124, 58, 237, .28), rgba(6, 182, 212, .12));
+    box-shadow: inset 3px 0 var(--tc-cyan);
+}
+
+.layout > .main .hero {
+    background-image:
+        linear-gradient(105deg, rgba(8, 14, 27, .9), rgba(13, 44, 80, .64) 58%, rgba(8, 14, 27, .38)),
+        url("https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80");
+    background-position: center;
+    background-size: cover;
+}
+
+.layout > .main .card,
+body > header.top + main:not(.card) .card {
+    border-color: color-mix(in srgb, var(--line) 78%, var(--tc-cyan) 8%);
+    box-shadow: 0 16px 42px rgba(8, 14, 27, .08);
+}
+
+.layout > .main .row,
+body > header.top + main:not(.card) .row {
+    border-radius: 13px;
+}
+
+body > header.top {
+    background: rgba(8, 14, 27, .96);
+    color: #f8fafc;
+    backdrop-filter: blur(18px);
+}
+
+body > header.top small {
+    color: #a7b6ca;
+}
+
+body > header.top + main:not(.card) .nav a {
+    border-color: rgba(148, 163, 184, .26);
+    border-radius: 999px;
+    transition: border-color .2s, background-color .2s, color .2s, transform .2s;
+}
+
+body > header.top + main:not(.card) .nav a:hover {
+    transform: translateY(-1px);
+    border-color: var(--tc-cyan);
+}
+
+body > header.top + main:not(.card) .hero {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .14);
+    background:
+        linear-gradient(110deg, rgba(8, 14, 27, .92), rgba(17, 24, 39, .76)),
+        url("https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80") center / cover;
+    box-shadow: 0 26px 64px rgba(8, 14, 27, .2);
+}
+
+body > header.top + main:not(.card) .card {
+    border-radius: 17px;
+    transition: transform .28s var(--tc-ease), box-shadow .28s, border-color .28s;
+}
+
+body > header.top + main:not(.card) .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 50px rgba(8, 14, 27, .13);
+}
+
+body > header.top + main:not(.card) :is(input, select, textarea) {
+    border-radius: 10px;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+body > header.top + main:not(.card) :is(input, select, textarea):focus {
+    border-color: var(--tc-violet);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, .13);
+    outline: 0;
+}
+
+body > header.top + main:not(.card) table tbody tr {
+    transition: background-color .18s;
+}
+
+body > header.top + main:not(.card) table tbody tr:hover {
+    background: rgba(124, 58, 237, .045);
+}
+
+/* Profile page */
+body > header.top + main.card {
+    border-color: rgba(148, 163, 184, .25);
+    border-radius: 20px;
+    box-shadow: 0 24px 70px rgba(8, 14, 27, .14);
+}
+
+body > header.top + main.card .form input {
+    border-radius: 10px;
+}
+
+@media (max-width: 760px) {
+    .auth-container .form-section {
+        border-radius: 0 0 22px 22px;
+    }
+
+    body > .app .top {
+        gap: 10px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}

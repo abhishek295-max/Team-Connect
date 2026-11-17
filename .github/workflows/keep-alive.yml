@@ -1,0 +1,24 @@
+name: Team Connect Keep Alive
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Team Connect
+        env:
+          TEAM_CONNECT_URL: ${{ secrets.TEAM_CONNECT_URL }}
+        run: |
+          if [[ -z "$TEAM_CONNECT_URL" ]]; then
+            echo "::error::TEAM_CONNECT_URL secret is not configured."
+            exit 1
+          fi
+
+          base_url="${TEAM_CONNECT_URL%/}"
+          curl --fail --silent --show-error --location \
+            --max-time 30 \
+            "$base_url/health"

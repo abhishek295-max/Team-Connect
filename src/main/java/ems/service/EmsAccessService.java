@@ -19,7 +19,9 @@ public class EmsAccessService {
     }
     public boolean admin(HttpServletRequest request){HttpSession s=request.getSession(false); return s!=null && Boolean.TRUE.equals(s.getAttribute("adminAuthenticated"));}
     public Employee currentEmployee(HttpServletRequest request){
-        Integer id=userId(request); return employees.findByTeamConnectUserId(id).orElseThrow(()->new ResponseStatusException(HttpStatus.FORBIDDEN,"No employee profile is linked to this account."));
+        Integer id=userId(request); Employee employee=employees.findByTeamConnectUserId(id).orElseThrow(()->new ResponseStatusException(HttpStatus.FORBIDDEN,"No employee profile is linked to this account."));
+        if(!"ACTIVE".equalsIgnoreCase(employee.getStatus())) throw new ResponseStatusException(HttpStatus.FORBIDDEN,"This employee profile is inactive.");
+        return employee;
     }
     public Employee requireEmployee(HttpServletRequest request, Long employeeId){
         if(admin(request)) return employees.findById(employeeId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Employee not found."));

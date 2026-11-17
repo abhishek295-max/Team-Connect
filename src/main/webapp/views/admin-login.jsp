@@ -89,7 +89,7 @@ body::after{width:500px;height:500px;bottom:-220px;left:-120px;background:radial
 @media(max-width:860px){.shell{grid-template-columns:1fr;height:auto}.scene{flex:none;max-height:260px}.vis{padding:28px 28px 20px}.vs{display:none}.vis p{display:none}.scene{max-width:420px;margin:0 auto}.form{padding:44px 28px 32px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
-</head>
+<link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/premium.css"></head>
 <body>
 <div class="gridbg"></div>
 <main class="shell">

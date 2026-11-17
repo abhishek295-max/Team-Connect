@@ -168,7 +168,74 @@
 
     window.toggleAiPanel = function () { const panel=document.getElementById('aiPanel'); if(!panel)return; const open=panel.classList.toggle('open'); panel.setAttribute('aria-hidden',String(!open)); if(open) document.getElementById('aiInput')?.focus(); };
     window.useAiPrompt = function (text) { const input=document.getElementById('aiInput'); if(input){input.value=text;input.focus();} };
-    window.sendAiMessage = async function (event) { event.preventDefault(); const input=document.getElementById('aiInput'); const text=input?.value.trim(); if(!text)return; const box=document.getElementById('aiMessages'); const user=document.createElement('div'); user.className='ai-message user'; user.textContent=text; box.appendChild(user); input.value=''; try { const response=await fetch(`${document.querySelector('[data-context-path]').dataset.contextPath}/api/ai/chat`,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({message:text})}); const data=await response.json(); const item=document.createElement('div'); item.className='ai-message assistant'; item.textContent=data.reply||'No response available.'; box.appendChild(item); box.scrollTop=box.scrollHeight; } catch(e) { const item=document.createElement('div'); item.className='ai-message assistant'; item.textContent='Assistant is temporarily unavailable.'; box.appendChild(item); } };
+    window.sendAiMessage = async function (event) {
+        event.preventDefault();
+        const input = document.getElementById("aiInput");
+        const text = input?.value.trim();
+        if (!text) return;
+        const box = document.getElementById("aiMessages");
+        const user = document.createElement("div");
+        user.className = "ai-message user";
+        user.textContent = text;
+        box.appendChild(user);
+        input.value = "";
+        try {
+            const response = await fetch(`${document.querySelector("[data-context-path]").dataset.contextPath}/api/ai/chat`, {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({
+                    message: text,
+                    contactId: String(activeContactId || ""),
+                    groupId: String(activeGroupId || "")
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || "Assistant request failed.");
+            const item = document.createElement("div");
+            item.className = "ai-message assistant";
+            item.textContent = data.reply || "No response available.";
+            box.appendChild(item);
+            box.scrollTop = box.scrollHeight;
+        } catch (error) {
+            const item = document.createElement("div");
+            item.className = "ai-message assistant";
+            item.textContent = error.message || "Assistant is temporarily unavailable.";
+            box.appendChild(item);
+        }
+    };
+
+    window.loadAgentWorkspace = async function () {
+        const contextPath = document.querySelector("[data-context-path]")?.dataset.contextPath || "";
+        const taskList = document.getElementById("agentTaskList");
+        const digest = document.getElementById("notificationDigest");
+        try {
+            const [taskResponse, digestResponse] = await Promise.all([
+                fetch(`${contextPath}/api/ai/tasks`),
+                fetch(`${contextPath}/api/ai/notifications/digest`)
+            ]);
+            if (!taskResponse.ok || !digestResponse.ok) throw new Error("Could not load tasks or notifications.");
+            const [tasks, notifications] = await Promise.all([taskResponse.json(), digestResponse.json()]);
+            taskList.replaceChildren();
+            tasks.forEach(task => {
+                const row = document.createElement("div");
+                row.className = "ai-message assistant";
+                row.textContent = `${task.status}: ${task.title}${task.due_date ? ` (due ${task.due_date})` : ""}`;
+                if (task.status === "OPEN") {
+                    const complete = document.createElement("button");
+                    complete.type = "button";
+                    complete.textContent = "Complete";
+                    complete.dataset.completeTask = String(task.id);
+                    row.appendChild(complete);
+                }
+                taskList.appendChild(row);
+            });
+            digest.textContent = notifications.length
+                ? `Priority notification digest: ${notifications.map(item => `${item.title}${item.count > 1 ? ` (x${item.count})` : ""}: ${item.message}`).join(" | ")}`
+                : "No unread notifications.";
+        } catch (error) {
+            if (taskList) taskList.textContent = error.message;
+        }
+    };
 
     const shell = document.querySelector("[data-context-path]");
     if (!shell) {
@@ -204,6 +271,47 @@
 
     let activeContactId = Number(shell.dataset.activeContactId || 0);
     let activeGroupId = 0;
+
+    const agentTaskForm = document.getElementById("agentTaskForm");
+    const agentTaskList = document.getElementById("agentTaskList");
+    if (agentTaskForm) {
+        agentTaskForm.addEventListener("submit", async event => {
+            event.preventDefault();
+            const titleInput = document.getElementById("agentTaskTitle");
+            const title = titleInput?.value.trim();
+            if (!title) return;
+            try {
+                const response = await fetch(`${contextPath}/api/ai/tasks`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({
+                        title,
+                        sourceGroupId: String(activeGroupId || "")
+                    })
+                });
+                if (!response.ok) throw new Error("Could not save this task.");
+                titleInput.value = "";
+                window.loadAgentWorkspace();
+            } catch (error) {
+                if (agentTaskList) agentTaskList.textContent = error.message;
+            }
+        });
+    }
+    if (agentTaskList) {
+        agentTaskList.addEventListener("click", async event => {
+            const button = event.target.closest("[data-complete-task]");
+            if (!button) return;
+            try {
+                const response = await fetch(`${contextPath}/api/ai/tasks/${button.dataset.completeTask}/complete`, {
+                    method: "PATCH"
+                });
+                if (!response.ok) throw new Error("Could not update this task.");
+                window.loadAgentWorkspace();
+            } catch (error) {
+                agentTaskList.textContent = error.message;
+            }
+        });
+    }
 
     function draftKey(contactId) {
         return `chatDraft:${currentUserId}:${contactId}`;
@@ -1209,5 +1317,3 @@
     });
 
 })();
-
-
