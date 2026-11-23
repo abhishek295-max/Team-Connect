@@ -248,6 +248,11 @@ public class ApplicationController {
         return "\"" + text + "\"";
     }
 
+    @GetMapping("/login")
+    public String loginPage() {
+        return "redirect:/views/register.jsp";
+    }
+
     @PostMapping("/login")
     public String login(
             @RequestParam String username,
