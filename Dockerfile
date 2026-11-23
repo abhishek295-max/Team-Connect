@@ -11,12 +11,11 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # ---------- Runtime Stage ----------
-FROM tomcat:11.0-jdk21-temurin
+FROM eclipse-temurin:17-jre
 
-RUN rm -rf /usr/local/tomcat/webapps/*
+WORKDIR /app
+COPY --from=builder /app/target/Online_Chat_App.war /app/team-connect.war
 
-COPY --from=builder /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
+EXPOSE 10000
 
-EXPOSE 8080
-
-CMD ["catalina.sh", "run"]
+CMD ["sh", "-c", "exec java ${JAVA_OPTS:-} -jar /app/team-connect.war"]

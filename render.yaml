@@ -6,7 +6,7 @@ services:
 
     autoDeploy: true
 
-    healthCheckPath: /
+    healthCheckPath: /health
 
     envVars:
       - key: JAVA_OPTS
