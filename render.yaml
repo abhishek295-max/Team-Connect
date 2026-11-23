@@ -10,4 +10,10 @@ services:
 
     envVars:
       - key: JAVA_OPTS
-        value: "-Xms256m -Xmx512m"
+        value: "-Xms64m -Xmx320m -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=32m -Xss512k"
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
